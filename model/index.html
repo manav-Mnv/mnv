@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Manav Sinh (mnv): AI/ML student at Parul University building AI agents that show their work, and Swift apps that make people feel something.">
+<meta property="og:title" content="mnv.model · Manav Sinh">
+<meta property="og:description" content="A portfolio that behaves like a neural network.">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>mnv.model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:ROND,wght@0..100,100..900&family=Recursive:slnt,wght,CASL,CRSV,MONO@-15..0,300..1000,0..1,0..1,0..1&family=Martian+Mono:wdth,wght@75..112.5,100..800&family=Nothing+You+Could+Do&family=Syne:wght@800&display=swap">
+<style>
+/* Layout: the portfolio is a model. Hero = diffusion sample of "mnv" plus a tiny "route me" network, right rail = training loss curve
+   as scroll nav, sections = epochs. Palette: midnight navy with electric and ice blues, and Swift orange as the one contrast colour. */
+:root {
+  --bg: #070d1c;
+  --surface: #0d1730;
+  --rule: #1f2d50;
+  --fg: #eaf2ff;
+  --muted: #8ea3c7;
+  --m1: #8fd3ff;   /* ice blue: highlight */
+  --m2: #ff7a45;   /* Swift orange: action + contrast */
+  --m3: #3d8bff;   /* electric blue */
+  --m4: #5ce1e6;   /* cyan */
+  --particle: 234, 242, 255;
+  /* Type: Doto (dot-matrix display, echoes the particle hero), Recursive (body; its Casual axis slides
+     from crisp to hand-drawn when you switch to dost mode), Martian Mono (data and labels), Nothing You Could Do (Fragments handwriting). */
+  --display: "Doto", "Courier New", monospace;
+  --body: "Recursive", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --mono: "Martian Mono", ui-monospace, Menlo, Consolas, monospace;
+  --hand: "Nothing You Could Do", "Bradley Hand", "Segoe Print", cursive;
+  --casl: 0;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #eef4fc; --surface: #ffffff; --rule: #cfdcef; --fg: #0b1630; --muted: #4f6286;
+    --m1: #0069c2; --m2: #e0521b; --m3: #1d5fd6; --m4: #0a7f9e; --particle: 11, 22, 48; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #eef4fc; --surface: #ffffff; --rule: #cfdcef; --fg: #0b1630; --muted: #4f6286;
+  --m1: #0069c2; --m2: #e0521b; --m3: #1d5fd6; --m4: #0a7f9e; --particle: 11, 22, 48; color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--fg); font: 400 18px/1.62 var(--body); overflow-x: hidden; font-variation-settings: "CASL" var(--casl), "MONO" 0; transition: font-variation-settings .6s; }
+:root.dost { --casl: 1; }
+[style*="--mono"], .mono { font-stretch: 87.5%; }
+a { color: var(--m2); text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--m1); outline-offset: 3px; border-radius: 4px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.top {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 9;
+  background: color-mix(in srgb, var(--bg) 84%, transparent); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--rule);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top-in { font-stretch: 87.5%; max-width: 1180px; margin: 0 auto; padding-block: 12px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  font: 500 13px/1 var(--mono); color: var(--muted); }
+.brand { color: var(--fg); font: 900 26px/1 var(--display); letter-spacing: -.01em; text-decoration: none; font-variation-settings: "ROND" 100; }
+.brand span { color: var(--m2); }
+.readout { font-variant-numeric: tabular-nums; }
+.mode { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 999px; padding: 3px; background: var(--surface); }
+.seg button { font: 500 12.5px/1 var(--mono); color: var(--muted); background: none; border: 0; padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--m2); color: #fff; }
+.themeb { font: 500 12.5px/1 var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 9px 12px; cursor: pointer; }
+.themeb:hover { border-color: var(--m3); }
+
+.page { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.grid { max-width: 1180px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 48px; }
+main { display: grid; gap: 120px; padding-block: 24px 120px; min-width: 0; }
+
+.rail { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 80px); align-self: start; height: calc(100vh - 120px); padding-top: 24px; }
+.rail svg { width: 100%; height: 100%; overflow: visible; }
+.rail .axis { stroke: var(--rule); }
+.rail .ghost { fill: none; stroke: var(--rule); stroke-width: 1.5; }
+.rail .live { fill: none; stroke: url(#vir); stroke-width: 2.5; stroke-linecap: round; }
+.rail .ep { font: 500 11px var(--mono); fill: var(--muted); cursor: pointer; }
+.rail .ep.on { fill: var(--m1); }
+.rail .tick { stroke: var(--rule); }
+.rail .head { fill: var(--m2); }
+.rail-title { font: 500 11px/1.4 var(--mono); color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+
+.eh { display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap; margin-bottom: 28px; }
+.eh .ep-l { font: 500 12px/1 var(--mono); color: var(--m3); letter-spacing: .1em; text-transform: uppercase; }
+h2 { font: 900 clamp(40px, 6.6vw, 84px)/.98 var(--display); letter-spacing: -.02em; margin: 0; text-wrap: balance; width: 100%; font-variation-settings: "ROND" 100; transition: font-variation-settings .5s; }
+h2:hover { font-variation-settings: "ROND" 0; }
+h2 em { font-style: normal; color: var(--m3); font-weight: 600; }
+.hint { font: 400 13px/1.5 var(--mono); color: var(--muted); }
+.fine { font: 400 12px/1.5 var(--mono); color: var(--muted); margin: 0; }
+.badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge { font: 500 12px/1 var(--mono); padding: 7px 10px; border-radius: 6px; border: 1px solid var(--rule); color: var(--muted); }
+.badge b { color: var(--m1); font-weight: 500; }
+button.chip, a.chip {
+  font: 500 13px/1 var(--mono); color: var(--fg); background: var(--surface); border: 1px solid var(--rule);
+  padding: 10px 14px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-block;
+}
+button.chip:hover, a.chip:hover { border-color: var(--m2); color: var(--m2); }
+
+/* hero */
+.hero { position: relative; display: grid; gap: 18px; }
+.stage { position: relative; height: clamp(170px, 34vw, 400px); }
+.stage::before { content: ""; position: absolute; inset: 10% 20% 0 0; background: radial-gradient(closest-side, color-mix(in srgb, var(--m3) 22%, transparent), transparent); pointer-events: none; }
+#diff { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
+.stage .meta { position: absolute; left: 0; bottom: 0; display: flex; gap: 16px; flex-wrap: wrap; font: 500 12px/1 var(--mono); color: var(--muted); pointer-events: none; }
+.stage .meta b { color: var(--m1); font-weight: 500; font-variant-numeric: tabular-nums; }
+.who { font: 700 14px/1.5 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--m3); margin: 0; }
+.tagline { font: 500 clamp(21px, 2.8vw, 30px)/1.38 var(--body); max-width: 34ch; margin: 0; min-height: 4.1em; }
+.tagline .tok { animation: tokin .35s ease-out both; }
+@keyframes tokin { from { opacity: 0; filter: blur(4px); } }
+.hero-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.facts { font: 500 13px/1.5 var(--mono); color: var(--muted); }
+
+/* router network */
+.router { margin-top: 30px; background: var(--surface); border: 1px solid var(--rule); border-radius: 18px; padding: 22px; display: grid; gap: 16px; }
+.router h3 { margin: 0; font: 900 clamp(26px, 3.4vw, 38px)/1.05 var(--display); font-variation-settings: "ROND" 100; }
+.router h3 span { color: var(--m2); }
+.who-r { display: flex; gap: 8px; flex-wrap: wrap; }
+.who-r button[aria-pressed="true"] { background: var(--m3); border-color: var(--m3); color: #fff; }
+.net { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 260px); gap: 18px; align-items: center; }
+.net svg { width: 100%; height: auto; max-height: 230px; display: block; }
+.net .ed { stroke: var(--rule); stroke-width: 1; transition: stroke .35s, opacity .35s, stroke-width .35s; }
+.net .ed.a { stroke: var(--m3); }
+.net .ed.b { stroke: var(--m2); stroke-width: 2.5; }
+.net circle { fill: var(--bg); stroke: var(--muted); stroke-width: 1.5; transition: fill .35s, stroke .35s; }
+.net circle.on { fill: var(--m3); stroke: var(--m1); }
+.net circle.win { fill: var(--m2); stroke: var(--m2); }
+.probs { display: grid; gap: 8px; font: 500 12.5px/1.2 var(--mono); }
+.probs div { display: grid; grid-template-columns: 92px minmax(0, 1fr) 40px; gap: 8px; align-items: center; color: var(--muted); }
+.probs i { height: 8px; border-radius: 4px; background: var(--rule); position: relative; overflow: hidden; }
+.probs i b { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--m3); border-radius: 4px; transition: width .6s; }
+.probs div.best { color: var(--fg); }
+.probs div.best i b { background: var(--m2); }
+.verdict { margin: 0; font-size: 19px; min-height: 2.6em; }
+.verdict a { font: 700 13px var(--mono); }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 140%); z-index: 20; max-width: min(92vw, 520px);
+  background: var(--fg); color: var(--bg); font: 500 13.5px/1.5 var(--mono); padding: 14px 18px; border-radius: 12px; transition: transform .4s; box-shadow: 0 10px 40px rgba(0,0,0,.35); }
+.toast.show { transform: translate(-50%, 0); }
+.toast a { color: var(--m2); }
+
+/* attention */
+.attn-box { position: relative; }
+#arcs { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+#arcs path { fill: none; stroke: var(--m3); stroke-linecap: round; }
+.sent { position: relative; font: 600 clamp(26px, 3.9vw, 46px)/1.8 var(--body); margin: 0; padding-top: 1.2em; }
+.sent .w { cursor: pointer; padding: 0 .08em; border-radius: 6px; transition: background .2s, color .2s; }
+.sent .w.q { color: var(--m2); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 8px; }
+.attn-legend { display: flex; gap: 10px; align-items: center; font: 400 12px var(--mono); color: var(--muted); margin-top: 18px; flex-wrap: wrap; }
+.ramp { width: 140px; height: 8px; border-radius: 4px; background: linear-gradient(90deg, transparent, var(--m3), var(--m4), var(--m1)); border: 1px solid var(--rule); }
+
+/* hound */
+.hound { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 20px; }
+.copy { display: grid; gap: 14px; max-width: 64ch; margin-bottom: 26px; }
+.copy p { margin: 0; }
+.gview { align-self: start; background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; display: grid; min-width: 0; }
+.gview svg { width: 100%; height: auto; display: block; aspect-ratio: 600 / 380; }
+.gview .e { stroke: var(--rule); stroke-width: 1.5; transition: stroke .4s, stroke-width .4s; }
+.gview .e.lit { stroke: var(--m3); stroke-width: 2.5; }
+.gview .n circle { fill: var(--bg); stroke: var(--muted); stroke-width: 1.5; transition: fill .4s, stroke .4s, transform .5s; }
+.gview .n text { font: 500 11px var(--mono); fill: var(--muted); transition: fill .4s; }
+.gview .n.lit circle { stroke: var(--m3); fill: color-mix(in srgb, var(--m3) 25%, var(--bg)); }
+.gview .n.lit text { fill: var(--fg); }
+.gview .n.alert circle { stroke: var(--m2); stroke-width: 2.5; }
+.gview .n.hub circle { stroke: var(--m1); fill: color-mix(in srgb, var(--m1) 30%, var(--bg)); }
+.gview .bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; padding: 12px 14px; border-top: 1px solid var(--rule); font: 500 12px/1.4 var(--mono); color: var(--muted); }
+.run { font: 700 13px/1 var(--mono); color: #fff; background: var(--m2); border: 0; border-radius: 8px; padding: 11px 14px; cursor: pointer; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.step { border: 1px solid var(--rule); border-radius: 12px; padding: 12px 14px; background: var(--surface); opacity: .55; transition: opacity .3s, border-color .3s; min-width: 0; }
+.step.on { opacity: 1; border-color: var(--m3); }
+.step.done { opacity: .9; }
+.step h4 { margin: 0; font: 700 13px/1.3 var(--mono); display: flex; gap: 8px; }
+.step h4 span { color: var(--m3); }
+.step p { margin: 6px 0 0; font-size: 16px; line-height: 1.45; color: var(--muted); }
+.step pre { margin: 8px 0 0; font: 400 11.5px/1.5 var(--mono); color: var(--m4); white-space: pre-wrap; word-break: break-word; }
+
+/* fragments */
+.frag { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.paper { position: relative; aspect-ratio: 4 / 3; max-width: 100%; border-radius: 16px; border: 1px solid var(--rule); overflow: hidden;
+  background: var(--surface); background-image: radial-gradient(var(--rule) 1px, transparent 1px); background-size: 18px 18px; }
+#draw { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+.story { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px 18px; font: 400 clamp(22px, 2.8vw, 30px)/1.3 var(--hand); color: var(--fg); pointer-events: none;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--surface) 92%, transparent) 40%); }
+.story small { display: block; font: 400 11px/1.4 var(--mono); color: var(--muted); margin-top: 6px; }
+.paper .clear { position: absolute; top: 10px; right: 10px; }
+.frag .copy { margin: 0; }
+.quote { font: 400 22px/1.45 var(--body); font-variation-settings: "CASL" 1, "slnt" -10, "CRSV" 1; margin: 0; border-left: 3px solid var(--m2); padding-left: 16px; }
+
+/* latent */
+.latent { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.plot { position: relative; background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; aspect-ratio: 4 / 3; max-width: 100%; overflow: hidden;
+  background-image: linear-gradient(var(--rule) .5px, transparent .5px), linear-gradient(90deg, var(--rule) .5px, transparent .5px); background-size: 12.5% 16.66%; }
+.plot svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.plot .nn { stroke: var(--m2); stroke-width: 1.5; stroke-dasharray: 3 4; vector-effect: non-scaling-stroke; }
+.zone { position: absolute; font: 700 11px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); opacity: .7; pointer-events: none; }
+.pt { position: absolute; transform: translate(-7px, -50%); display: flex; align-items: center; gap: 7px; background: none; border: 0; padding: 4px 0; cursor: pointer;
+  font: 500 12px/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.pt.l { flex-direction: row-reverse; transform: translate(calc(-100% + 7px), -50%); }
+.pt i { width: 12px; height: 12px; border-radius: 50%; flex: none; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--rule); transition: transform .2s; }
+.pt.project i { background: var(--m1); width: 14px; height: 14px; }
+.pt.skill i { background: var(--m3); }
+.pt.community i { background: var(--m2); }
+.pt.interest i { background: var(--m4); }
+.pt.on { color: var(--fg); }
+.pt.on i { transform: scale(1.35); }
+.pt.sel span { background: var(--fg); color: var(--bg); padding: 3px 6px; border-radius: 4px; }
+.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; padding: 22px; display: grid; gap: 10px; min-width: 0; }
+.card .kind { font: 500 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--m3); }
+.card h3 { font: 900 32px/1.05 var(--display); margin: 0; font-variation-settings: "ROND" 100; }
+.card p { margin: 0; font-size: 18px; }
+.card .nbrs { font: 400 12.5px/1.6 var(--mono); color: var(--muted); }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font: 400 12px var(--mono); color: var(--muted); margin-top: 12px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+/* git log */
+.term { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; }
+.term-bar { display: flex; gap: 8px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--rule); font: 500 12px var(--mono); color: var(--muted); }
+.term-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--rule); }
+.term-bar i:first-child { background: var(--m2); }
+.log { list-style: none; margin: 0; padding: 18px 16px; font: 400 14.5px/1.55 var(--mono); }
+.log li { display: grid; grid-template-columns: 22px 78px minmax(0, 1fr); gap: 10px; padding: 6px 0; cursor: pointer; }
+.log .g { color: var(--m3); }
+.log .h { color: var(--m1); }
+.log .msg { min-width: 0; }
+.log .ref { color: var(--m2); }
+.log .body { display: block; color: var(--muted); font-size: 13px; max-height: 0; overflow: hidden; transition: max-height .35s; }
+.log li:hover .body, .log li:focus-within .body, .log li.open .body { max-height: 8em; }
+.log li:focus { outline: none; }
+.log li:focus-visible .msg { outline: 2px solid var(--m1); }
+.cmd { padding: 14px 16px 0; font: 400 14px var(--mono); color: var(--muted); }
+.cmd b { color: var(--m4); font-weight: 400; }
+
+/* inference */
+.infer { background: var(--surface); border: 1px solid var(--rule); border-radius: 18px; padding: 24px; display: grid; gap: 16px; }
+.out { font: 400 21px/1.55 var(--body); min-height: 5em; margin: 0; }
+.out .lbl { font: 500 12px/1 var(--mono); color: var(--m3); display: block; margin-bottom: 8px; letter-spacing: .08em; text-transform: uppercase; }
+.out .cur { display: inline-block; width: .5em; height: 1em; background: var(--m2); vertical-align: -2px; margin-left: 3px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.ask { display: flex; gap: 10px; flex-wrap: wrap; }
+.ask input { flex: 1 1 240px; min-width: 0; font: 400 16px var(--mono); color: var(--fg); background: var(--bg); border: 1px solid var(--rule); border-radius: 10px; padding: 12px 14px; }
+.ask button { font: 700 14px var(--mono); color: #fff; background: var(--m2); border: 0; border-radius: 10px; padding: 12px 18px; cursor: pointer; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.links { display: flex; gap: 10px; flex-wrap: wrap; }
+footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap: 18px; flex-wrap: wrap; }
+
+@media (max-width: 700px) { .net { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 900px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .rail { display: none; }
+  .latent, .hound, .frag { grid-template-columns: minmax(0, 1fr); }
+  main { gap: 88px; }
+}
+@media (max-width: 600px) {
+  .mode { margin-left: 0; }
+  .readout { display: none; }
+  .pt span { display: none; }
+  .pt.project span, .pt.sel span { display: inline; }
+  .zone { display: none; }
+  .log li { grid-template-columns: 18px minmax(0, 1fr); }
+  .log .h, .log .msg { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .tagline .tok, .out .cur { animation: none; }
+}
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="../" title="Back to the main site" style="margin-right:4px">←</a>
+    <a class="brand" href="#sample">mnv<span>.</span>model</a>
+    <span class="readout" id="readout">epoch 0 · loss 2.310</span>
+    <div class="mode"><span id="modeLbl">talk to me like a</span>
+      <div class="seg" role="group" aria-labelledby="modeLbl">
+        <button type="button" data-mode="pro" aria-pressed="true">recruiter</button>
+        <button type="button" data-mode="dost" aria-pressed="false">dost</button>
+      </div>
+      <button class="themeb" id="themeb" type="button" aria-label="Switch light or dark mode">☀ light</button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="grid">
+    <main>
+      <section class="hero" id="sample" data-epoch="0" aria-labelledby="hero-h">
+        <h1 class="sr" id="hero-h">Manav Sinh (mnv): AI/ML student, Swift developer, builder</h1>
+        <div class="stage">
+          <canvas id="diff" aria-label="Particles denoising into the letters mnv. Move your pointer over them to add noise."></canvas>
+          <div class="meta"><span>sampling · t = <b id="tstep">1000</b></span><span>σ = <b id="sig">1.00</b></span><span>hover to add noise</span></div>
+        </div>
+        <p class="who">Manav Sinh · B.Tech CSE (AI/ML) · Parul University, Vadodara</p>
+        <p class="tagline" id="tagline" aria-live="polite"></p>
+        <div class="hero-row">
+          <button class="chip" id="resample" type="button">↻ resample</button>
+          <a class="chip" href="#hound">see Hound →</a>
+          <a class="chip" href="#fragments">see Fragments →</a>
+          <span class="facts">AI agents · graph databases · Python · Swift · open source · GSoC 2026 aspirant</span>
+        </div>
+        <div class="router" aria-labelledby="route-h">
+          <h3 id="route-h">Who are you? <span>Let the model route you.</span></h3>
+          <div class="who-r" role="group" aria-label="Pick who you are">
+            <button class="chip" type="button" data-who="0" aria-pressed="false">recruiter</button>
+            <button class="chip" type="button" data-who="1" aria-pressed="false">developer</button>
+            <button class="chip" type="button" data-who="2" aria-pressed="false">designer / creative</button>
+            <button class="chip" type="button" data-who="3" aria-pressed="false">student</button>
+            <button class="chip" type="button" data-who="4" aria-pressed="false">just curious</button>
+          </div>
+          <div class="net">
+            <svg id="net" viewBox="0 0 420 200" aria-hidden="true"></svg>
+            <div class="probs" id="probs" aria-live="polite"></div>
+          </div>
+          <p class="verdict" id="verdict">Pick one. A tiny 5-6-5 network will run a forward pass and tell you where to start.</p>
+        </div>
+      </section>
+
+      <section id="attention" data-epoch="1" aria-labelledby="attn-h">
+        <div class="eh"><span class="ep-l">epoch 01 · self-attention</span><h2 id="attn-h">What I care about, <em>one head at a time</em></h2>
+          <span class="hint">Hover or tap a word to see what it attends to.</span></div>
+        <div class="attn-box" id="attnBox">
+          <svg id="arcs" aria-hidden="true"></svg>
+          <p class="sent" id="sent"></p>
+        </div>
+        <div class="attn-legend"><span>attention weight</span><span class="ramp"></span><span>0 → 1</span></div>
+      </section>
+
+      <section id="hound" data-epoch="2" aria-labelledby="hound-h">
+        <div class="eh"><span class="ep-l">epoch 02 · featured project</span><h2 id="hound-h">Hound <em>sniffs out</em> money laundering</h2></div>
+        <div class="copy">
+          <p data-pro="An anti-money-laundering investigation tool. When a bank raises an alert, Hound's AI agents trace the transaction network in a graph database, rank who matters, and draft a suspicious activity report where every claim links to evidence. A human analyst makes the final call."
+             data-dost="Banks get flooded with fraud alerts. Hound sends AI agents into a graph of accounts and companies, follows the money, and writes the report with receipts attached. A human still decides, because AI shouldn't be sending anyone to jail on vibes."></p>
+          <div class="badges">
+            <span class="badge">built by <b>Team Musketeer</b></span>
+            <span class="badge"><b>WeMakeDevs × FalkorDB</b> Graph Hacks 2026</span>
+            <span class="badge">tested on <b>71</b> synthetic alerts</span>
+            <span class="badge">FalkorDB · Cypher · MCP · multi-agent</span>
+            <a class="chip" href="https://github.com/manav-Mnv/hound-aml">code on GitHub →</a>
+          </div>
+        </div>
+        <div class="hound">
+          <div class="gview">
+            <svg id="graph" viewBox="0 0 600 380" role="img" aria-label="Illustrative transaction graph that Hound investigates step by step"></svg>
+            <div class="bar"><span id="gstat">alert A-0042 raised · 0 / 5 steps</span><button class="run" id="run" type="button">▶ investigate alert</button></div>
+          </div>
+          <ol class="steps" id="steps"></ol>
+        </div>
+        <p class="fine" style="margin-top:14px">Illustrative replay with made-up accounts. The real Hound runs on FalkorDB with read-only queries, so agents can look but never change data.</p>
+      </section>
+
+      <section id="fragments" data-epoch="3" aria-labelledby="frag-h">
+        <div class="eh"><span class="ep-l">epoch 03 · featured project</span><h2 id="frag-h">Fragments: <em>draw yourself in</em></h2></div>
+        <div class="frag">
+          <div class="paper">
+            <canvas id="draw" aria-label="Drawing area. Draw a stroke to move the story forward."></canvas>
+            <button class="chip clear" id="clear" type="button">clear</button>
+            <p class="story" id="story" aria-live="polite"></p>
+          </div>
+          <div class="copy">
+            <p class="quote">Some projects are built to impress. Some are built to express. Fragments is mine.</p>
+            <p data-pro="An interactive story I built in Swift Playgrounds for the WWDC26 Swift Student Challenge. You don't just watch it: you draw yourself into each scene with PencilKit, while ambient sound plays and a handwritten font keeps it personal. The question behind it: what if healing feels like participation?"
+               data-dost="My WWDC26 Swift Student Challenge entry. It's a story where you literally draw yourself into it with Apple Pencil. Music in the background, handwritten font, thoda emotional. It pushed me more emotionally than technically, honestly."></p>
+            <div class="badges"><span class="badge"><b>WWDC26</b> Swift Student Challenge</span><span class="badge">SwiftUI · PencilKit · AVFoundation</span><a class="chip" href="https://github.com/manav-Mnv/Fragments">code on GitHub →</a></div>
+            <p class="fine">Try it on the left: every stroke you draw moves the story forward, like in the app.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="latent" data-epoch="4" aria-labelledby="lat-h">
+        <div class="eh"><span class="ep-l">epoch 04 · latent space</span><h2 id="lat-h">My work, <em>embedded</em></h2>
+          <span class="hint">Everything I do, placed by how related it is. Tap a point to see its nearest neighbours.</span></div>
+        <div class="latent">
+          <div>
+            <div class="plot" id="plot"><svg id="nnl" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg></div>
+            <div class="legend"><span><i style="background:var(--m1)"></i>project</span><span><i style="background:var(--m3)"></i>skill</span><span><i style="background:var(--m2)"></i>community</span><span><i style="background:var(--m4)"></i>interest</span></div>
+          </div>
+          <article class="card" id="card" aria-live="polite"></article>
+        </div>
+      </section>
+
+      <section id="log" data-epoch="5" aria-labelledby="log-h">
+        <div class="eh"><span class="ep-l">epoch 05 · history</span><h2 id="log-h">git log <em>--me</em></h2>
+          <span class="hint">Hover or tap a commit for details. Newest first.</span></div>
+        <div class="term">
+          <div class="term-bar"><i></i><i></i><i></i><span>manav@vadodara: ~/life</span></div>
+          <div class="cmd"><b>$</b> git log --graph --oneline</div>
+          <ol class="log" id="gitlog"></ol>
+        </div>
+      </section>
+
+      <section id="inference" data-epoch="6" aria-labelledby="inf-h">
+        <div class="eh"><span class="ep-l">epoch 06 · inference</span><h2 id="inf-h">Prompt <em>me</em></h2></div>
+        <div class="infer">
+          <p class="out"><span class="lbl">mnv.model</span><span id="outText">Ask me anything. I'm small, but I try.</span><span class="cur"></span></p>
+          <form class="ask" id="askForm">
+            <label class="sr" for="q">Your prompt</label>
+            <input id="q" autocomplete="off" placeholder="e.g. what is Fragments?">
+            <button type="submit">generate</button>
+          </form>
+          <div class="chips">
+            <button class="chip" type="button" data-q="what is Hound?">what is Hound?</button>
+            <button class="chip" type="button" data-q="what is Fragments?">what is Fragments?</button>
+            <button class="chip" type="button" data-q="what are you up to right now?">what are you up to right now?</button>
+            <button class="chip" type="button" data-q="can we collaborate?">can we collaborate?</button>
+            <button class="chip" type="button" data-q="hinglish mein bolo">hinglish mein bolo</button>
+          </div>
+          <div class="links"><a class="chip" href="https://in.linkedin.com/in/mnvdev">LinkedIn: mnvdev</a><a class="chip" href="https://github.com/manav-Mnv">GitHub: manav-Mnv</a></div>
+          <p class="fine">Scripted replies, so it's a lookup table pretending to be an LLM.</p>
+        </div>
+      </section>
+
+      <footer><span>mnv.model · v5</span><span>psst: type "hire" anywhere</span><span>trained on chai, Swift and Cypher queries</span><span>hosted on GitHub Pages</span></footer>
+    </main>
+
+    <div class="toast" id="toast" role="status"></div>
+    <aside class="rail" aria-label="Training progress">
+      <div class="rail-title">train/loss</div>
+      <svg id="loss" viewBox="0 0 150 600"></svg>
+    </aside>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  let mode = 'pro';
+
+  function streamInto(el, text, speed) {
+    clearInterval(el._t); el.textContent = '';
+    if (reduce) { el.textContent = text; return; }
+    const toks = text.match(/\S+\s*/g) || []; let i = 0;
+    el._t = setInterval(() => {
+      if (i >= toks.length) return clearInterval(el._t);
+      const s = document.createElement('span'); s.className = 'tok'; s.textContent = toks[i++]; el.appendChild(s);
+    }, speed);
+  }
+
+  /* ---------- audience mode ---------- */
+  const taglines = {
+    pro: "I build AI agents that show their work, and Swift apps that make people feel something. I also help run the Swift Coding Club at Parul University.",
+    dost: "bhai, AI agents for catching money launderers, Swift apps for feelings. dono chalta hai. plus club manage karta hoon."
+  };
+  function setMode(m) {
+    mode = m; document.documentElement.classList.toggle('dost', m === 'dost');
+    document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+    streamInto($('#tagline'), taglines[m], 55);
+    document.querySelectorAll('[data-pro]').forEach(el => { el.textContent = el.dataset[m]; });
+    $('#outText').textContent = m === 'pro' ? "Ask me anything. I'm small, but I try." : "kuch bhi pucho. chhota model hoon, par koshish poori hai.";
+  }
+  document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+
+  /* ---------- diffusion hero ---------- */
+  const cv = $('#diff'), ctx = cv.getContext('2d');
+  let P = [], W = 0, H = 0, t0 = 0; const mouse = { x: -1e4, y: -1e4 }, T = 2600;
+  const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+  function targets() {
+    const off = document.createElement('canvas'); off.width = W; off.height = H;
+    const o = off.getContext('2d'), face = fs => `800 ${fs}px Syne, "Avenir Next", system-ui, sans-serif`;
+    o.font = face(100);
+    const m = o.measureText('mnv'), w100 = m.width, h100 = (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent) || 75;
+    const fs = Math.min(W * 0.94 / w100, H * 0.82 / h100) * 100;
+    o.font = face(fs); o.textBaseline = 'alphabetic'; o.fillStyle = '#000';
+    const mm = o.measureText('mnv'), asc = mm.actualBoundingBoxAscent || fs * 0.55, dsc = mm.actualBoundingBoxDescent || 0;
+    o.fillText('mnv', W * 0.02, H / 2 + (asc - dsc) / 2);
+    const d = o.getImageData(0, 0, W, H).data, pts = [], gap = Math.max(4, Math.round(Math.sqrt(W * H / 3000)));
+    for (let y = 0; y < H; y += gap) for (let x = 0; x < W; x += gap) if (d[(y * W + x) * 4 + 3] > 128) pts.push([x, y]);
+    return pts;
+  }
+  function seed() {
+    const r = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+    W = Math.max(1, Math.floor(r.width)); H = Math.max(1, Math.floor(r.height));
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const spread = Math.max(W, H) * 0.35;
+    P = targets().map(([x, y]) => ({ x, y, nx: gauss() * spread, ny: gauss() * spread, kx: 0, ky: 0, h: Math.random() }));
+    t0 = performance.now();
+  }
+  const sigma = p => Math.cos(Math.min(1, p) * Math.PI / 2) ** 2;
+  function frame(now) {
+    const p = reduce ? 1 : (now - t0) / T, s = sigma(p);
+    ctx.clearRect(0, 0, W, H);
+    const pc = css('--particle'), hot = [css('--m1'), css('--m2'), css('--m3')];
+    for (const q of P) {
+      const dx = q.x + q.nx * s + q.kx - mouse.x, dy = q.y + q.ny * s + q.ky - mouse.y, d2 = dx * dx + dy * dy;
+      if (d2 < 3600 && !reduce) { const f = (3600 - d2) / 3600; q.kx += gauss() * 6 * f; q.ky += gauss() * 6 * f; }
+      q.kx *= 0.93; q.ky *= 0.93;
+      const x = q.x + q.nx * s + q.kx, y = q.y + q.ny * s + q.ky, k = Math.min(1, Math.hypot(q.kx, q.ky) / 30 + s);
+      ctx.fillStyle = k > 0.15 ? hot[Math.floor(q.h * 3)] : `rgb(${pc})`;
+      ctx.globalAlpha = 0.35 + 0.65 * (1 - s * 0.6);
+      ctx.fillRect(x - 1.3, y - 1.3, 2.6, 2.6);
+    }
+    ctx.globalAlpha = 1;
+    $('#tstep').textContent = Math.round(1000 * Math.max(0, 1 - Math.min(1, p)) ** 0.8);
+    $('#sig').textContent = s.toFixed(2);
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  cv.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; });
+  cv.addEventListener('pointerleave', () => { mouse.x = mouse.y = -1e4; });
+  $('#resample').addEventListener('click', () => { seed(); setMode(mode); if (reduce) frame(performance.now()); });
+
+  /* ---------- attention ---------- */
+  const words = "I build AI agents that show their work so humans can check the evidence before they trust the answer".split(' ');
+  const A = {
+    I: { build: .9, agents: .5 }, build: { agents: .9, I: .6, work: .4 },
+    agents: { show: .8, build: .7, work: .6, answer: .4 }, show: { work: .95, evidence: .7, agents: .5 },
+    work: { show: .9, evidence: .6, agents: .5 }, humans: { check: .9, trust: .7, evidence: .4 },
+    check: { evidence: 1, humans: .7, trust: .5 }, evidence: { check: .9, show: .7, trust: .6, answer: .5 },
+    trust: { evidence: .9, humans: .6, answer: .7 }, answer: { trust: .8, evidence: .6, agents: .4 }
+  };
+  const sent = $('#sent');
+  words.forEach((w, i) => {
+    const s = document.createElement('span'); s.className = 'w'; s.textContent = w; s.dataset.w = w; if (A[w]) s.tabIndex = 0;
+    sent.appendChild(s); if (i < words.length - 1) sent.appendChild(document.createTextNode(' '));
+  });
+  let focusWord = 'evidence';
+  function drawArcs() {
+    const box = $('#attnBox').getBoundingClientRect(), svg = $('#arcs'), spans = [...sent.querySelectorAll('.w')], wts = A[focusWord] || {};
+    const mix = w => `color-mix(in srgb, ${w > .75 ? 'var(--m1)' : w > .5 ? 'var(--m4)' : 'var(--m3)'} ${Math.round(22 + w * 40)}%, transparent)`;
+    let src;
+    spans.forEach(s => { const w = wts[s.dataset.w] || 0; s.classList.toggle('q', s.dataset.w === focusWord); s.style.background = w ? mix(w) : ''; if (s.dataset.w === focusWord) src = s; });
+    if (!src) { svg.innerHTML = ''; return; }
+    const c = el => { const r = el.getBoundingClientRect(); return [r.left - box.left + r.width / 2, r.top - box.top + r.height * 0.18]; };
+    const [sx, sy] = c(src);
+    svg.innerHTML = spans.filter(s => wts[s.dataset.w]).map(s => {
+      const [tx, ty] = c(s), w = wts[s.dataset.w], lift = Math.min(90, 26 + Math.abs(tx - sx) * 0.18), top = Math.min(sy, ty) - lift;
+      return `<path d="M${sx},${sy} C${sx},${top} ${tx},${top} ${tx},${ty}" stroke-width="${(1 + w * 4).toFixed(1)}" opacity="${(0.25 + w * 0.7).toFixed(2)}"/>`;
+    }).join('');
+  }
+  const pick = e => { const w = e.target.closest('.w'); if (w && A[w.dataset.w]) { focusWord = w.dataset.w; drawArcs(); } };
+  sent.addEventListener('pointerover', pick); sent.addEventListener('click', pick); sent.addEventListener('focusin', pick);
+
+  /* ---------- Hound investigation replay ---------- */
+  const N = {
+    a:  { l: 'A-0042', x: 70,  y: 190, k: 'alert' },
+    b:  { l: 'ACC-118', x: 165, y: 95 },  c: { l: 'ACC-207', x: 165, y: 290 },
+    d:  { l: 'Bluefin Traders', x: 290, y: 60 }, e: { l: 'Kestrel Holdings', x: 290, y: 320 },
+    f:  { l: 'Orion Exim', x: 300, y: 190 }, g: { l: 'Director R.', x: 420, y: 130 },
+    h:  { l: 'ACC-551', x: 430, y: 260 }, i: { l: 'Offshore LLC', x: 540, y: 70 }, j: { l: 'ACC-903', x: 545, y: 230 },
+    u1: { l: 'ACC-310', x: 470, y: 345 }, u2: { l: 'Grocer Pvt', x: 560, y: 330 }
+  };
+  const E = [['a','b'],['a','c'],['b','d'],['c','e'],['d','f'],['e','f'],['f','g'],['g','h'],['g','i'],['h','j'],['j','i'],['u1','u2']];
+  const hops = [['b','c'], ['d','e'], ['f'], ['g'], ['h','i'], ['j']];
+  const PR = { f: 1.9, g: 1.7, i: 1.35 };
+  const graph = $('#graph');
+  graph.innerHTML = E.map(([s, t]) => `<line class="e" data-s="${s}" data-t="${t}" x1="${N[s].x}" y1="${N[s].y}" x2="${N[t].x}" y2="${N[t].y}"/>`).join('') +
+    Object.entries(N).map(([id, n]) => `<g class="n ${n.k || ''}" data-id="${id}"><circle cx="${n.x}" cy="${n.y}" r="9" style="transform-origin:${n.x}px ${n.y}px"/>
+      <text x="${n.x}" y="${n.y + 24}" text-anchor="middle">${n.l}</text></g>`).join('');
+  const S = [
+    { t: 'Triage the alert', p: 'Pull the flagged account and its recent transfers.', q: "GRAPH.RO_QUERY aml \"MATCH (a:Account {id:'A-0042'})-[t:SENT]->() RETURN count(t), sum(t.amount)\"" },
+    { t: 'Follow the money', p: 'Multi-hop traversal through accounts, companies and the people behind them.', q: "MATCH p=(a {id:'A-0042'})-[:SENT|OWNS|DIRECTS*1..6]-(n) RETURN p" },
+    { t: 'Find the ring', p: 'Connected components separate the suspicious network from unrelated accounts.', q: 'CALL algo.WCC(...) YIELD node, componentId' },
+    { t: 'Rank who matters', p: 'PageRank surfaces the hubs: Orion Exim and Director R.', q: 'CALL algo.pageRank(...) YIELD node, score ORDER BY score DESC' },
+    { t: 'Draft the report, human decides', p: 'Every claim in the draft links to an evidence ID (E-01 to E-04). The analyst approves or rejects.', q: '// read-only: agents can look, never write' }
+  ];
+  $('#steps').innerHTML = S.map((s, i) => `<li class="step"><h4><span>0${i + 1}</span>${s.t}</h4><p>${s.p}</p><pre>${s.q.replace(/</g, '&lt;')}</pre></li>`).join('');
+  const nodeEl = id => graph.querySelector(`.n[data-id="${id}"]`);
+  let running = false;
+  const wait = ms => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+  function stepOn(i) {
+    document.querySelectorAll('.step').forEach((s, k) => { s.classList.toggle('on', k === i); s.classList.toggle('done', k < i); });
+    $('#gstat').textContent = `alert A-0042 · step ${i + 1} / 5`;
+  }
+  async function investigate() {
+    if (running) return; running = true; $('#run').textContent = '… investigating';
+    graph.querySelectorAll('.lit, .hub').forEach(e => e.classList.remove('lit', 'hub'));
+    graph.querySelectorAll('.n circle').forEach(c => { c.style.transform = ''; });
+    stepOn(0); nodeEl('a').classList.add('lit'); await wait(900);
+    stepOn(1); const seen = new Set(['a']);
+    for (const hop of hops) {
+      hop.forEach(id => { seen.add(id); nodeEl(id).classList.add('lit'); });
+      graph.querySelectorAll('.e').forEach(e => { if (seen.has(e.dataset.s) && seen.has(e.dataset.t)) e.classList.add('lit'); });
+      await wait(420);
+    }
+    stepOn(2); await wait(900);
+    stepOn(3); Object.entries(PR).forEach(([id, sc]) => { const n = nodeEl(id); n.classList.add('hub'); n.querySelector('circle').style.transform = `scale(${sc})`; }); await wait(1100);
+    stepOn(4); await wait(700);
+    document.querySelectorAll('.step').forEach(s => s.classList.add('done'));
+    $('#gstat').textContent = 'report drafted · waiting for analyst review';
+    $('#run').textContent = '↻ run again'; running = false;
+  }
+  $('#run').addEventListener('click', investigate);
+  if ('IntersectionObserver' in window) new IntersectionObserver((en, ob) => { if (en[0].isIntersecting) { investigate(); ob.disconnect(); } }, { threshold: 0.5 }).observe(graph);
+
+  /* ---------- Fragments drawing ---------- */
+  const lines = [
+    "Draw something. Anything.",
+    "You're not watching this story.",
+    "You're part of it now.",
+    "Some projects are built to impress.",
+    "Some are built to express.",
+    "What if healing feels like participation?",
+    "Sometimes we're all just pieces of a bigger story.",
+    "And sometimes we need to draw ourselves back into it."
+  ];
+  const dc = $('#draw'), dx = dc.getContext('2d'), story = $('#story');
+  let li = 0, drawing = false, last = null, strokeLen = 0;
+  function sizeDraw() {
+    const r = dc.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+    dc.width = Math.max(1, r.width * dpr); dc.height = Math.max(1, r.height * dpr); dx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dx.lineCap = dx.lineJoin = 'round';
+  }
+  const setLine = () => { story.innerHTML = ''; story.append(lines[li]); const sm = document.createElement('small'); sm.textContent = `scene ${li + 1} / ${lines.length}`; story.append(sm); };
+  const pos = e => { const r = dc.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  dc.addEventListener('pointerdown', e => { drawing = true; last = pos(e); strokeLen = 0; dc.setPointerCapture(e.pointerId); });
+  dc.addEventListener('pointermove', e => {
+    if (!drawing) return; const p = pos(e), pr = e.pressure && e.pressure !== 0.5 ? e.pressure : 0.6;
+    dx.strokeStyle = [css('--m2'), css('--m3'), css('--m1')][li % 3]; dx.lineWidth = 2 + pr * 5;
+    dx.beginPath(); dx.moveTo(...last); dx.lineTo(...p); dx.stroke();
+    strokeLen += Math.hypot(p[0] - last[0], p[1] - last[1]); last = p;
+  });
+  const end = () => { if (drawing && strokeLen > 40 && li < lines.length - 1) { li++; setLine(); } drawing = false; };
+  dc.addEventListener('pointerup', end); dc.addEventListener('pointercancel', end);
+  $('#clear').addEventListener('click', () => { dx.clearRect(0, 0, dc.width, dc.height); li = 0; setLine(); });
+
+  /* ---------- latent space ---------- */
+  const zones = [['swift & apple', 3, 4], ['agents & graphs', 62, 4], ['community', 3, 64]];
+  const pts = [
+    { id: 'frag', k: 'project', n: 'Fragments', x: .16, y: .3, s: 'r', d: 'Interactive story for the WWDC26 Swift Student Challenge. You draw yourself into it with PencilKit.', url: '#fragments' },
+    { id: 'swiftui', k: 'skill', n: 'SwiftUI + PencilKit', x: .08, y: .14, s: 'r', d: 'Building interfaces and drawing experiences for Apple devices.' },
+    { id: 'swift', k: 'skill', n: 'Swift', x: .32, y: .22, s: 'r', d: 'My main language for apps, learned through the club and the Swift Student Challenge.' },
+    { id: 'agents', k: 'skill', n: 'AI agents + MCP', x: .58, y: .13, s: 'r', d: 'Agents that investigate, review and remember, with a human in the loop.' },
+    { id: 'cypher', k: 'skill', n: 'Cypher + graph algos', x: .95, y: .25, s: 'l', d: 'Multi-hop graph queries, WCC and PageRank, kept read-only when agents run them.' },
+    { id: 'hound', k: 'project', n: 'Hound', x: .66, y: .35, s: 'r', d: 'Multi-agent anti-money-laundering investigator on FalkorDB. Team Musketeer, Graph Hacks 2026.', url: '#hound' },
+    { id: 'falkor', k: 'project', n: 'FalkorDB field notes', x: .95, y: .47, s: 'l', d: 'Edge cases I hit in FalkorDB 6.0 while building Hound: Docker tags, query behaviour, algorithm support, Windows dev setup.' },
+    { id: 'python', k: 'skill', n: 'Python', x: .47, y: .42, s: 'r', d: 'For AI/ML work and agent tooling.' },
+    { id: 'site', k: 'project', n: 'mnv.model', x: .34, y: .55, s: 'l', d: 'This site. A portfolio that behaves like a neural network.' },
+    { id: 'research', k: 'interest', n: 'AI/ML research', x: .6, y: .6, s: 'r', d: 'Started in 2026: learning the fundamentals and hunting for real research gaps.' },
+    { id: 'gsoc', k: 'interest', n: 'GSoC 2026 prep', x: .64, y: .79, s: 'r', d: "Working towards Google Summer of Code. No merged PR yet, but learning a ton from the process." },
+    { id: 'club', k: 'community', n: 'Swift Coding Club PU', x: .1, y: .74, s: 'r', d: 'I help manage the Swift Coding Club at Parul University.' },
+    { id: 'gdg', k: 'community', n: 'GDG Baroda', x: .42, y: .84, s: 'r', d: 'Monthly Sunday meetups with Google Developer Groups Baroda.' },
+    { id: 'meetups', k: 'community', n: 'Swift Mumbai + SwiftDidLoad', x: .07, y: .92, s: 'r', d: 'Travelled from Vadodara to Mumbai with the club for Swift Mumbai at Paytm. Also went to SwiftDidLoad.' },
+    { id: 'cpp', k: 'skill', n: 'C++ / LeetCode', x: .95, y: .9, s: 'l', d: 'Practising fundamentals and problem solving.' }
+  ];
+  const plot = $('#plot');
+  plot.insertAdjacentHTML('beforeend', zones.map(([t, x, y]) => `<span class="zone" style="left:${x}%;top:${y}%">${t}</span>`).join('') +
+    pts.map(p => `<button type="button" class="pt ${p.k} ${p.s}" data-id="${p.id}" style="left:${p.x * 100}%;top:${p.y * 100}%" aria-label="${p.n}, ${p.k}"><i></i><span>${p.n}</span></button>`).join(''));
+  const nn = (p, k = 3) => pts.filter(q => q !== p).map(q => [q, Math.hypot(q.x - p.x, (q.y - p.y) * .75)]).sort((a, b) => a[1] - b[1]).slice(0, k);
+  function select(id) {
+    const p = pts.find(q => q.id === id), ns = nn(p);
+    plot.querySelectorAll('.pt').forEach(e => { e.classList.toggle('sel', e.dataset.id === id); e.classList.toggle('on', e.dataset.id === id || ns.some(([q]) => q.id === e.dataset.id)); });
+    $('#nnl').innerHTML = ns.map(([q]) => `<line class="nn" x1="${p.x * 100}" y1="${p.y * 100}" x2="${q.x * 100}" y2="${q.y * 100}"/>`).join('');
+    $('#card').innerHTML = `<span class="kind">${p.k}</span><h3>${p.n}</h3><p>${p.d}</p>
+      ${p.url ? `<a class="chip" href="${p.url}">open →</a>` : ''}
+      <span class="nbrs">nearest neighbours: ${ns.map(([q, d]) => `${q.n} (${Math.max(0, 1 - d).toFixed(2)})`).join(' · ')}</span>`;
+  }
+  plot.addEventListener('click', e => { const t = e.target.closest('.pt'); if (t) select(t.dataset.id); });
+  plot.addEventListener('pointerover', e => { const t = e.target.closest('.pt'); if (t && e.pointerType === 'mouse') select(t.dataset.id); });
+  plot.addEventListener('focusin', e => { const t = e.target.closest('.pt'); if (t) select(t.dataset.id); });
+  select('hound');
+
+  /* ---------- git log ---------- */
+  const commits = [
+    ['*', 'a1f3c9e', '<span class="ref">(HEAD -> main)</span> build mnv.model, this portfolio', 'Diffusion hero, attention map, latent space. Built in public.'],
+    ['*', '9c4e2d7', 'trip: Vadodara → Mumbai for Swift Mumbai', 'Went with the Swift Coding Club crew and our mentor to the meetup at the Paytm office. Came back with a notebook full of ideas.'],
+    ['*', '8b10f3a', 'start AI/ML research', 'Learning the fundamentals and digging for real research gaps.'],
+    ['*', '7e55a01', 'wip: GSoC 2026 prep', "No merged PR yet. Still pushing, still learning."],
+    ['*', '7d21b04', 'ship Hound at WeMakeDevs × FalkorDB Graph Hacks 2026', 'Team Musketeer. Multi-agent AML investigation on a graph database, with a live demo and 71 synthetic test alerts.'],
+    ['*', '6a0c9e2', 'feat: Fragments for the WWDC26 Swift Student Challenge', 'SwiftUI, PencilKit and AVFoundation. Built to express, not to impress.'],
+    ['|\\', '3b9f117', 'merge: Swift Coding Club Parul University', 'Joined, then started helping manage it. Also GDG Baroda meetups and SwiftDidLoad.'],
+    ['*', '0000001', 'init: start B.Tech CSE (AI/ML) at Parul University', 'Random weights. Lots of curiosity.']
+  ];
+  $('#gitlog').innerHTML = commits.map(([gr, h, m, b]) => `<li tabindex="0"><span class="g">${gr}</span><span class="h">${h}</span><span class="msg">${m}<span class="body">${b}</span></span></li>`).join('');
+  $('#gitlog').addEventListener('click', e => { const li = e.target.closest('li'); if (li) li.classList.toggle('open'); });
+
+  /* ---------- loss rail ---------- */
+  const loss = $('#loss'), NL = 120, LW = 150, LH = Math.max(300, Math.round(loss.getBoundingClientRect().height) || 600);
+  loss.setAttribute('viewBox', `0 0 ${LW} ${LH}`);
+  const L = Array.from({ length: NL }, (_, i) => 2.31 * Math.exp(-i / 34) + 0.32 + Math.sin(i * 1.7) * 0.05 * Math.exp(-i / 60) + (Math.random() - .5) * 0.06);
+  const lx = v => 18 + (v / 2.5) * (LW - 30), ly = i => (i / (NL - 1)) * (LH - 20) + 10;
+  const d = L.map((v, i) => `${i ? 'L' : 'M'}${lx(v).toFixed(1)},${ly(i).toFixed(1)}`).join(' ');
+  const secs = [...document.querySelectorAll('section[data-epoch]')];
+  loss.innerHTML = `<defs><linearGradient id="vir" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--m3)"/><stop offset=".5" stop-color="var(--m4)"/><stop offset="1" stop-color="var(--m1)"/></linearGradient></defs>
+    <line class="axis" x1="18" y1="0" x2="18" y2="${LH}"/>
+    ${secs.map((s, i) => { const y = ly(Math.round(i / (secs.length - 1) * (NL - 1))); return `<line class="tick" x1="12" x2="24" y1="${y}" y2="${y}"/><text class="ep" data-i="${i}" x="${LW}" y="${y + 4}" text-anchor="end">ep ${i}</text>`; }).join('')}
+    <path class="ghost" d="${d}"/><path class="live" id="live" d="${d}"/><circle class="head" id="head" r="4" cx="${lx(L[0])}" cy="${ly(0)}"/>`;
+  const live = $('#live'), len = live.getTotalLength();
+  live.style.strokeDasharray = len;
+  loss.querySelectorAll('.ep').forEach(t => t.addEventListener('click', () => secs[+t.dataset.i].scrollIntoView()));
+  function onScroll() {
+    const max = document.documentElement.scrollHeight - innerHeight, f = max > 0 ? Math.min(1, scrollY / max) : 0, i = Math.round(f * (NL - 1));
+    live.style.strokeDashoffset = len * (1 - f);
+    const h = $('#head'); h.setAttribute('cx', lx(L[i])); h.setAttribute('cy', ly(i));
+    let ep = 0; secs.forEach((s, k) => { if (s.getBoundingClientRect().top < innerHeight * 0.45) ep = k; });
+    loss.querySelectorAll('.ep').forEach(t => t.classList.toggle('on', +t.dataset.i === ep));
+    $('#readout').textContent = `epoch ${ep} · loss ${L[i].toFixed(3)}`;
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  /* ---------- inference ---------- */
+  const R = [
+    [/hound|aml|launder|fraud|graph/i,
+      "Hound is an anti-money-laundering tool my team built for WeMakeDevs × FalkorDB Graph Hacks 2026. AI agents trace suspicious money through a graph database and draft an evidence-backed report. A human makes the final decision.",
+      "Hound = AI jasoos for banks. Paisa kahan se kahan gaya, graph mein trace karta hai, report likhta hai with proof. Final faisla insaan ka."],
+    [/fragment|wwdc|swift student|pencil/i,
+      "Fragments is my WWDC26 Swift Student Challenge entry: an interactive story where you draw yourself into each scene with PencilKit. Built with SwiftUI and AVFoundation.",
+      "Fragments meri WWDC26 entry hai. Story mein tum khud ko draw karte ho Apple Pencil se. Thoda emotional project hai, honestly."],
+    [/now|up to|working|currently|research|gsoc/i,
+      "Right now: AI/ML research, prepping for GSoC 2026, helping run the Swift Coding Club, and GDG Baroda meetups every month.",
+      "Abhi: AI/ML research, GSoC ki taiyari (PR merge hona baaki hai), club manage karna, aur GDG Baroda meetups."],
+    [/study|college|university|degree|parul/i,
+      "B.Tech in Computer Science with an AI/ML specialization at Parul University in Vadodara.",
+      "Parul University, Vadodara. CSE with AI/ML."],
+    [/collab|together|hire|intern|job|work with|contact|reach/i,
+      "Yes. I'm open to internships, research collaborations and hackathon teams. Reach me on LinkedIn (mnvdev) or GitHub (manav-Mnv).",
+      "Haan bilkul! Internship, hackathon, side project, sab chalega. LinkedIn pe mnvdev ya GitHub pe manav-Mnv."],
+    [/hinglish|hindi|bolo|bhai/i,
+      "Haan bhai. Main AI agents banata hoon jo apna kaam dikhate hain, aur Swift apps jo feel karwate hain. Kuch banana hai? Ping karo.",
+      "Haan bhai. Main AI agents banata hoon jo apna kaam dikhate hain, aur Swift apps jo feel karwate hain. Kuch banana hai? Ping karo."],
+    [/skill|stack|language|python|swift|c\+\+/i,
+      "Python and AI agents for the research side, Swift and SwiftUI for apps, Cypher and graph algorithms from Hound, plus C++ for fundamentals.",
+      "Python + agents for AI, Swift for apps, Cypher for graphs, C++ for basics."],
+    [/who|you|about|name/i,
+      "I'm Manav Sinh (mnv), an AI/ML student at Parul University who builds AI agents and Swift apps.",
+      "Manav here, ya mnv. Student, builder, part-time money-launderer-catcher."]
+  ];
+  const answer = q => { const hit = R.find(([re]) => re.test(q)); if (hit) return mode === 'pro' ? hit[1] : hit[2];
+    return mode === 'pro' ? "I don't have a good answer for that one yet. Try asking about Hound or Fragments." : "yeh mere training data mein nahi tha. Hound ya Fragments ke baare mein pucho."; };
+  const ask = q => { if (q.trim()) streamInto($('#outText'), answer(q), 50); };
+  $('#askForm').addEventListener('submit', e => { e.preventDefault(); ask($('#q').value); });
+  document.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', () => { $('#q').value = b.dataset.q; ask(b.dataset.q); }));
+
+  /* ---------- router network ---------- */
+  const outs = [
+    { n: 'Hound', href: '#hound' }, { n: 'Fragments', href: '#fragments' }, { n: 'Work map', href: '#latent' },
+    { n: 'git log', href: '#log' }, { n: 'Prompt me', href: '#inference' }
+  ];
+  const route = [
+    { o: 0, m: 'pro', v: "Start with Hound: AI agents that investigate money laundering on a graph database, shipped at a hackathon with my team." },
+    { o: 2, m: 'pro', v: "Start with the work map: every skill and project I have, and how they connect." },
+    { o: 1, m: 'pro', v: "Start with Fragments: a story you draw yourself into. It's built for feelings, not features." },
+    { o: 3, m: 'dost', v: "Start with git log: how a fresher from Parul ended up shipping hackathon projects. You can do it too, bhai." },
+    { o: 4, m: 'dost', v: "Start with Prompt me: ask my mini model anything. Hinglish bhi chalega." }
+  ];
+  const net = $('#net'), X = [30, 200, 370], Y = (n, i) => 20 + i * (160 / (n - 1));
+  let rs = 7; const rnd = () => (rs = (rs * 16807) % 2147483647) / 2147483647;
+  const W1 = [...Array(5)].map(() => [...Array(6)].map(rnd)), W2 = [...Array(6)].map(() => [...Array(5)].map(rnd));
+  let svgN = '';
+  for (let i = 0; i < 5; i++) for (let h = 0; h < 6; h++) svgN += `<line class="ed" data-l="1" data-i="${i}" data-h="${h}" x1="${X[0]}" y1="${Y(5, i)}" x2="${X[1]}" y2="${Y(6, h)}"/>`;
+  for (let h = 0; h < 6; h++) for (let o = 0; o < 5; o++) svgN += `<line class="ed" data-l="2" data-h="${h}" data-o="${o}" x1="${X[1]}" y1="${Y(6, h)}" x2="${X[2]}" y2="${Y(5, o)}"/>`;
+  for (let i = 0; i < 5; i++) svgN += `<circle data-in="${i}" cx="${X[0]}" cy="${Y(5, i)}" r="8"/>`;
+  for (let h = 0; h < 6; h++) svgN += `<circle data-hid="${h}" cx="${X[1]}" cy="${Y(6, h)}" r="8"/>`;
+  for (let o = 0; o < 5; o++) svgN += `<circle data-out="${o}" cx="${X[2]}" cy="${Y(5, o)}" r="9"/>`;
+  net.innerHTML = svgN;
+  const drawProbs = (p, top) => { $('#probs').innerHTML = outs.map((o, k) => `<div class="${k === top ? 'best' : ''}"><span>${o.n}</span><i><b style="width:${Math.round(p[k] * 100)}%"></b></i><span>${Math.round(p[k] * 100)}%</span></div>`).join(''); };
+  drawProbs([0, 0, 0, 0, 0], -1);
+  let routing = false;
+  async function forward(i) {
+    if (routing) return; routing = true;
+    document.querySelectorAll('[data-who]').forEach(b => b.setAttribute('aria-pressed', +b.dataset.who === i));
+    net.querySelectorAll('.a, .b, .on, .win').forEach(e => e.classList.remove('a', 'b', 'on', 'win'));
+    const r = route[i];
+    net.querySelector(`[data-in="${i}"]`).classList.add('on');
+    $('#verdict').textContent = 'running forward pass…';
+    net.querySelectorAll(`.ed[data-l="1"][data-i="${i}"]`).forEach(e => { e.classList.add('a'); e.style.opacity = .3 + W1[i][+e.dataset.h] * .7; });
+    await wait(450);
+    const act = W1[i].map(w => w > .35);
+    act.forEach((on, h) => on && net.querySelector(`[data-hid="${h}"]`).classList.add('on'));
+    await wait(350);
+    net.querySelectorAll('.ed[data-l="2"]').forEach(e => { if (act[+e.dataset.h]) { e.classList.add(+e.dataset.o === r.o ? 'b' : 'a'); e.style.opacity = +e.dataset.o === r.o ? 1 : .25; } });
+    await wait(450);
+    net.querySelector(`[data-out="${r.o}"]`).classList.add('win');
+    const raw = outs.map((_, k) => k === r.o ? 3.2 : 1 + rnd()), sum = raw.reduce((a, b) => a + b, 0);
+    drawProbs(raw.map(v => v / sum), r.o);
+    if (mode !== r.m) setMode(r.m);
+    $('#verdict').innerHTML = `${r.v} <a href="${outs[r.o].href}">take me there →</a>`;
+    routing = false;
+  }
+  document.querySelectorAll('[data-who]').forEach(b => b.addEventListener('click', () => forward(+b.dataset.who)));
+
+  /* ---------- easter egg: type "hire" ---------- */
+  let buf = '', tt;
+  addEventListener('keydown', e => {
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    buf = (buf + (e.key.length === 1 ? e.key.toLowerCase() : '')).slice(-8);
+    if (buf.endsWith('hire')) {
+      const t = $('#toast'); buf = '';
+      t.innerHTML = '$ sudo hire manav<br>[sudo] permission granted ✓<br>LinkedIn: <a href="https://in.linkedin.com/in/mnvdev">in.linkedin.com/in/mnvdev</a> · GitHub: <a href="https://github.com/manav-Mnv">manav-Mnv</a>';
+      t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 6000);
+    }
+  });
+
+  /* ---------- light / dark switch ---------- */
+  const root = document.documentElement, tb = $('#themeb');
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const syncTheme = () => { tb.textContent = isDark() ? '☀ light' : '☾ dark'; };
+  try { const saved = localStorage.getItem('mnv-theme'); if (saved) root.dataset.theme = saved; } catch (e) {}
+  syncTheme();
+  tb.addEventListener('click', () => {
+    root.dataset.theme = isDark() ? 'light' : 'dark'; syncTheme();
+    try { localStorage.setItem('mnv-theme', root.dataset.theme); } catch (e) {}
+    drawArcs();
+  });
+
+  /* ---------- boot ---------- */
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { seed(); if (reduce) frame(performance.now()); drawArcs(); sizeDraw(); }, 150); });
+  const boot = () => { seed(); requestAnimationFrame(frame); setMode('pro'); drawArcs(); sizeDraw(); setLine(); onScroll(); };
+  const ready = document.fonts ? Promise.race([Promise.all([document.fonts.load('800 100px Syne'), document.fonts.load('900 40px Doto'), document.fonts.load('400 18px Recursive')]), new Promise(r => setTimeout(r, 1500))]) : Promise.resolve();
+  ready.then(boot, boot);
+})();
+</script>
+
+</body>
+</html>

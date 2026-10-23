@@ -1,12 +1,8 @@
-# mnv.model
+# mnv
 
-Personal portfolio of Manav Sinh (mnv): a site that behaves like a neural network.
+Personal site of Manav Sinh (mnv).
 
-Live: https://manav-mnv.github.io/mnv/
+- `/` is the main site: a scroll film with a dot-drawn hero, a spotlit about scene, a curved ribbon of work, and a Let's Talk footer.
+- `/model/` is mnv.model, the portfolio rebuilt as a neural network.
 
-- Diffusion hero that denoises into "mnv"
-- "Route me" network that sends visitors to the right section
-- Self-attention map, Hound investigation replay, drawable Fragments demo
-- Latent-space work map, `git log --me`, and a promptable mini model
-
-Plain HTML, CSS and JavaScript in one `index.html`. No build step.
+Plain static HTML, no build step. Deploys from `main` to GitHub Pages and to Vercel.
