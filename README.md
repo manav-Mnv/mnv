@@ -2,7 +2,8 @@
 
 Personal site of Manav Sinh (mnv).
 
-- `/` is the main site: a scroll film with a dot-drawn hero, a spotlit about scene, a curved ribbon of work, and a Let's Talk footer.
+- `/` is Forward Pass: scroll and the particles go from "mnv" to a portrait to a 3D network you fly through, ending on Let's Talk.
 - `/model/` is mnv.model, the portfolio rebuilt as a neural network.
+- `/film/` is the scroll film version.
 
-Plain static HTML, no build step. Deploys from `main` to GitHub Pages and to Vercel.
+Plain static HTML, no build step. three.js, GSAP and Lenis are bundled in `vendor/`.
