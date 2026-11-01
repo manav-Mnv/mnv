@@ -218,6 +218,56 @@ button.chip:hover, a.chip:hover { border-color: var(--m2); color: var(--m2); }
 .legend { display: flex; gap: 16px; flex-wrap: wrap; font: 400 12px var(--mono); color: var(--muted); margin-top: 12px; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
 
+/* lume */
+.lume { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.roomw { position: relative; background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; overflow: hidden;
+  background-image: radial-gradient(var(--rule) 1px, transparent 1px); background-size: 20px 20px; }
+#room { display: block; width: 100%; height: auto; aspect-ratio: 1; touch-action: none; cursor: grab; }
+#room .ring { fill: none; stroke: var(--rule); stroke-dasharray: 3 5; }
+#room .cone { fill: color-mix(in srgb, var(--m1) 16%, transparent); stroke: color-mix(in srgb, var(--m1) 40%, transparent); }
+#room .north { font: 700 13px var(--mono); fill: var(--m2); }
+#room .you { fill: var(--m3); stroke: var(--bg); stroke-width: 3; }
+#room .pod rect { fill: var(--bg); stroke: var(--muted); stroke-width: 1.5; transition: fill .3s, stroke .3s; }
+#room .pod.lit rect { fill: var(--m2); stroke: var(--m2); }
+.roomw .meta { position: absolute; left: 12px; bottom: 10px; font: 500 12px/1 var(--mono); color: var(--muted); pointer-events: none; }
+.roomw .meta b { color: var(--m1); font-weight: 500; font-variant-numeric: tabular-nums; }
+.lume .card { margin-top: 14px; }
+
+/* project network */
+.pnet { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 20px; align-items: start; }
+.pnet-wrap { grid-column: 1 / -1; }
+.pnet-wrap { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; padding: 8px; min-width: 0; }
+#pn { display: block; width: 100%; height: auto; }
+#pn .layer { font: 700 11px var(--mono); fill: var(--m3); letter-spacing: .12em; }
+#pn .e { fill: none; stroke: var(--rule); transition: stroke .3s, opacity .3s; }
+#pn.focus .e { opacity: .18; }
+#pn .e.hot { stroke: var(--m3); opacity: 1; }
+#pn .nd { cursor: pointer; transition: opacity .3s; outline: none; }
+#pn .nd circle { fill: var(--bg); stroke-width: 2; transition: fill .3s, stroke-width .3s; }
+#pn .nd.in circle { stroke: var(--m3); }
+#pn .nd.th circle { stroke: var(--m4); }
+#pn .nd.pr circle { stroke: var(--m1); }
+#pn .nd.star circle { fill: var(--m2); stroke: var(--m2); }
+#pn .nd text { font: 500 14px var(--mono); fill: var(--muted); transition: fill .3s; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+#pn .nd text.sm { font-size: 15px; }
+#pn .nd.star text { fill: var(--fg); font-weight: 700; }
+#pn.focus .nd { opacity: .35; }
+#pn .nd.hot { opacity: 1; }
+#pn .nd.hot text { fill: var(--fg); }
+#pn .nd.hot circle { fill: color-mix(in srgb, var(--m3) 30%, var(--bg)); }
+#pn .nd.star.hot circle { fill: var(--m2); }
+#pn .nd.sel circle { stroke-width: 4; }
+#pn .nd:focus-visible circle { stroke: var(--fg); }
+#pn .pulse { fill: var(--m2); }
+.pchips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.pchips .chip { padding: 8px 12px; font-size: 12px; }
+.pchips .chip.star { border-color: var(--m2); }
+.pchips .chip[aria-pressed="true"] { background: var(--m3); border-color: var(--m3); color: #fff; }
+.card .why { font-size: 16px; color: var(--muted); }
+.card .why b { color: var(--fg); font-weight: 600; }
+.card .links { margin-top: 4px; }
+.pnet-foot { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
 /* git log */
 .term { background: var(--surface); border: 1px solid var(--rule); border-radius: 16px; overflow: hidden; }
 .term-bar { display: flex; gap: 8px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--rule); font: 500 12px var(--mono); color: var(--muted); }
@@ -253,7 +303,7 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
 @media (max-width: 900px) {
   .grid { grid-template-columns: minmax(0, 1fr); }
   .rail { display: none; }
-  .latent, .hound, .frag { grid-template-columns: minmax(0, 1fr); }
+  .latent, .hound, .frag, .lume, .pnet { grid-template-columns: minmax(0, 1fr); }
   main { gap: 88px; }
 }
 @media (max-width: 600px) {
@@ -302,7 +352,8 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
         <div class="hero-row">
           <button class="chip" id="resample" type="button">↻ resample</button>
           <a class="chip" href="#hound">see Hound →</a>
-          <a class="chip" href="#fragments">see Fragments →</a>
+          <a class="chip" href="#lume">see LUME →</a>
+          <a class="chip" href="#latent">all my projects →</a>
           <span class="facts">AI agents · graph databases · Python · Swift · open source · GSoC 2026 aspirant</span>
         </div>
         <div class="router" aria-labelledby="route-h">
@@ -355,8 +406,28 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
         <p class="fine" style="margin-top:14px">Illustrative replay with made-up accounts. The real Hound runs on FalkorDB with read-only queries, so agents can look but never change data.</p>
       </section>
 
-      <section id="fragments" data-epoch="3" aria-labelledby="frag-h">
-        <div class="eh"><span class="ep-l">epoch 03 · featured project</span><h2 id="frag-h">Fragments: <em>draw yourself in</em></h2></div>
+      <section id="lume" data-epoch="3" aria-labelledby="lume-h">
+        <div class="eh"><span class="ep-l">epoch 03 · featured project</span><h2 id="lume-h">LUME: <em>walk through your memories</em></h2></div>
+        <div class="lume">
+          <div class="roomw">
+            <svg id="room" viewBox="0 0 400 400" role="img" aria-label="Top-down view of a room. Drag to turn; memories in front of you light up."></svg>
+            <span class="meta">heading <b id="hdg">000°</b> · drag to turn</span>
+          </div>
+          <div>
+            <div class="copy" style="margin:0">
+              <p class="quote">Light Unveils Memory Environment.</p>
+              <p data-pro="An AR journal I built as a Swift App Playground for the WWDC Swift Student Challenge. Every memory you save, with a photo, a story and a GPS pin, becomes a 3D museum stand. LUME aligns AR to true north, so each memory stands in the direction where it actually happened, and you can walk from one to the next."
+                 data-dost="Diary, but you walk inside it. Photo, story, location daalo, and LUME turns each memory into a 3D museum stand around you, in the exact direction where it happened. Swift Student Challenge ke liye banaya, iPad pe AR mein chalta hai."></p>
+              <div class="badges"><span class="badge"><b>WWDC</b> Swift Student Challenge</span><span class="badge">SwiftUI · ARKit · RealityKit · MapKit</span><a class="chip" href="https://github.com/manav-Mnv/L-U-M-E">code on GitHub →</a></div>
+            </div>
+            <article class="card" id="placard" aria-live="polite"></article>
+            <p class="fine" style="margin-top:10px">Illustrative: the memories here are examples. In the app, their bearings come from the GPS pin on each memory.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="fragments" data-epoch="4" aria-labelledby="frag-h">
+        <div class="eh"><span class="ep-l">epoch 04 · featured project</span><h2 id="frag-h">Fragments: <em>draw yourself in</em></h2></div>
         <div class="frag">
           <div class="paper">
             <canvas id="draw" aria-label="Drawing area. Draw a stroke to move the story forward."></canvas>
@@ -373,20 +444,23 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
         </div>
       </section>
 
-      <section id="latent" data-epoch="4" aria-labelledby="lat-h">
-        <div class="eh"><span class="ep-l">epoch 04 · latent space</span><h2 id="lat-h">My work, <em>embedded</em></h2>
-          <span class="hint">Everything I do, placed by how related it is. Tap a point to see its nearest neighbours.</span></div>
-        <div class="latent">
+      <section id="latent" data-epoch="5" aria-labelledby="lat-h">
+        <div class="eh"><span class="ep-l">epoch 05 · the network</span><h2 id="lat-h">Every project, <em>wired up</em></h2>
+          <span class="hint">Skills feed themes, themes fire projects. Tap any node to see its path.</span></div>
+        <div class="pnet">
+          <div class="pnet-wrap"><svg id="pn" role="img" aria-label="Neural network of Manav's projects: skills, then themes, then projects"></svg></div>
           <div>
-            <div class="plot" id="plot"><svg id="nnl" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"></svg></div>
-            <div class="legend"><span><i style="background:var(--m1)"></i>project</span><span><i style="background:var(--m3)"></i>skill</span><span><i style="background:var(--m2)"></i>community</span><span><i style="background:var(--m4)"></i>interest</span></div>
+            <div class="pnet-foot"><button class="run" id="fire" type="button">▶ run a forward pass</button>
+              <span class="hint">Thicker edge = stronger link. Orange = featured.</span></div>
+            <div class="pchips" id="pchips" aria-label="Projects"></div>
           </div>
-          <article class="card" id="card" aria-live="polite"></article>
+          <article class="card" id="pcard" aria-live="polite"></article>
         </div>
+        <p class="fine" id="also" style="margin-top:16px"></p>
       </section>
 
-      <section id="log" data-epoch="5" aria-labelledby="log-h">
-        <div class="eh"><span class="ep-l">epoch 05 · history</span><h2 id="log-h">git log <em>--me</em></h2>
+      <section id="log" data-epoch="6" aria-labelledby="log-h">
+        <div class="eh"><span class="ep-l">epoch 06 · history</span><h2 id="log-h">git log <em>--me</em></h2>
           <span class="hint">Hover or tap a commit for details. Newest first.</span></div>
         <div class="term">
           <div class="term-bar"><i></i><i></i><i></i><span>manav@vadodara: ~/life</span></div>
@@ -395,8 +469,8 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
         </div>
       </section>
 
-      <section id="inference" data-epoch="6" aria-labelledby="inf-h">
-        <div class="eh"><span class="ep-l">epoch 06 · inference</span><h2 id="inf-h">Prompt <em>me</em></h2></div>
+      <section id="inference" data-epoch="7" aria-labelledby="inf-h">
+        <div class="eh"><span class="ep-l">epoch 07 · inference</span><h2 id="inf-h">Prompt <em>me</em></h2></div>
         <div class="infer">
           <p class="out"><span class="lbl">mnv.model</span><span id="outText">Ask me anything. I'm small, but I try.</span><span class="cur"></span></p>
           <form class="ask" id="askForm">
@@ -406,7 +480,8 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
           </form>
           <div class="chips">
             <button class="chip" type="button" data-q="what is Hound?">what is Hound?</button>
-            <button class="chip" type="button" data-q="what is Fragments?">what is Fragments?</button>
+            <button class="chip" type="button" data-q="what is LUME?">what is LUME?</button>
+            <button class="chip" type="button" data-q="what have you built?">what have you built?</button>
             <button class="chip" type="button" data-q="what are you up to right now?">what are you up to right now?</button>
             <button class="chip" type="button" data-q="can we collaborate?">can we collaborate?</button>
             <button class="chip" type="button" data-q="hinglish mein bolo">hinglish mein bolo</button>
@@ -416,7 +491,7 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
         </div>
       </section>
 
-      <footer><span>mnv.model · v5</span><span>psst: type "hire" anywhere</span><span>trained on chai, Swift and Cypher queries</span><span>hosted on GitHub Pages</span></footer>
+      <footer><span>mnv.model · v6</span><span>psst: type "hire" anywhere</span><span>trained on chai, Swift and Cypher queries</span><span>hosted on GitHub Pages</span></footer>
     </main>
 
     <div class="toast" id="toast" role="status"></div>
@@ -620,48 +695,238 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
   dc.addEventListener('pointerup', end); dc.addEventListener('pointercancel', end);
   $('#clear').addEventListener('click', () => { dx.clearRect(0, 0, dc.width, dc.height); li = 0; setLine(); });
 
-  /* ---------- latent space ---------- */
-  const zones = [['swift & apple', 3, 4], ['agents & graphs', 62, 4], ['community', 3, 64]];
-  const pts = [
-    { id: 'frag', k: 'project', n: 'Fragments', x: .16, y: .3, s: 'r', d: 'Interactive story for the WWDC26 Swift Student Challenge. You draw yourself into it with PencilKit.', url: '#fragments' },
-    { id: 'swiftui', k: 'skill', n: 'SwiftUI + PencilKit', x: .08, y: .14, s: 'r', d: 'Building interfaces and drawing experiences for Apple devices.' },
-    { id: 'swift', k: 'skill', n: 'Swift', x: .32, y: .22, s: 'r', d: 'My main language for apps, learned through the club and the Swift Student Challenge.' },
-    { id: 'agents', k: 'skill', n: 'AI agents + MCP', x: .58, y: .13, s: 'r', d: 'Agents that investigate, review and remember, with a human in the loop.' },
-    { id: 'cypher', k: 'skill', n: 'Cypher + graph algos', x: .95, y: .25, s: 'l', d: 'Multi-hop graph queries, WCC and PageRank, kept read-only when agents run them.' },
-    { id: 'hound', k: 'project', n: 'Hound', x: .66, y: .35, s: 'r', d: 'Multi-agent anti-money-laundering investigator on FalkorDB. Team Musketeer, Graph Hacks 2026.', url: '#hound' },
-    { id: 'falkor', k: 'project', n: 'FalkorDB field notes', x: .95, y: .47, s: 'l', d: 'Edge cases I hit in FalkorDB 6.0 while building Hound: Docker tags, query behaviour, algorithm support, Windows dev setup.' },
-    { id: 'python', k: 'skill', n: 'Python', x: .47, y: .42, s: 'r', d: 'For AI/ML work and agent tooling.' },
-    { id: 'site', k: 'project', n: 'mnv.model', x: .34, y: .55, s: 'l', d: 'This site. A portfolio that behaves like a neural network.' },
-    { id: 'research', k: 'interest', n: 'AI/ML research', x: .6, y: .6, s: 'r', d: 'Started in 2026: learning the fundamentals and hunting for real research gaps.' },
-    { id: 'gsoc', k: 'interest', n: 'GSoC 2026 prep', x: .64, y: .79, s: 'r', d: "Working towards Google Summer of Code. No merged PR yet, but learning a ton from the process." },
-    { id: 'club', k: 'community', n: 'Swift Coding Club PU', x: .1, y: .74, s: 'r', d: 'I help manage the Swift Coding Club at Parul University.' },
-    { id: 'gdg', k: 'community', n: 'GDG Baroda', x: .42, y: .84, s: 'r', d: 'Monthly Sunday meetups with Google Developer Groups Baroda.' },
-    { id: 'meetups', k: 'community', n: 'Swift Mumbai + SwiftDidLoad', x: .07, y: .92, s: 'r', d: 'Travelled from Vadodara to Mumbai with the club for Swift Mumbai at Paytm. Also went to SwiftDidLoad.' },
-    { id: 'cpp', k: 'skill', n: 'C++ / LeetCode', x: .95, y: .9, s: 'l', d: 'Practising fundamentals and problem solving.' }
-  ];
-  const plot = $('#plot');
-  plot.insertAdjacentHTML('beforeend', zones.map(([t, x, y]) => `<span class="zone" style="left:${x}%;top:${y}%">${t}</span>`).join('') +
-    pts.map(p => `<button type="button" class="pt ${p.k} ${p.s}" data-id="${p.id}" style="left:${p.x * 100}%;top:${p.y * 100}%" aria-label="${p.n}, ${p.k}"><i></i><span>${p.n}</span></button>`).join(''));
-  const nn = (p, k = 3) => pts.filter(q => q !== p).map(q => [q, Math.hypot(q.x - p.x, (q.y - p.y) * .75)]).sort((a, b) => a[1] - b[1]).slice(0, k);
-  function select(id) {
-    const p = pts.find(q => q.id === id), ns = nn(p);
-    plot.querySelectorAll('.pt').forEach(e => { e.classList.toggle('sel', e.dataset.id === id); e.classList.toggle('on', e.dataset.id === id || ns.some(([q]) => q.id === e.dataset.id)); });
-    $('#nnl').innerHTML = ns.map(([q]) => `<line class="nn" x1="${p.x * 100}" y1="${p.y * 100}" x2="${q.x * 100}" y2="${q.y * 100}"/>`).join('');
-    $('#card').innerHTML = `<span class="kind">${p.k}</span><h3>${p.n}</h3><p>${p.d}</p>
-      ${p.url ? `<a class="chip" href="${p.url}">open →</a>` : ''}
-      <span class="nbrs">nearest neighbours: ${ns.map(([q, d]) => `${q.n} (${Math.max(0, 1 - d).toFixed(2)})`).join(' · ')}</span>`;
+  /* ---------- LUME: memories stand where they happened ---------- */
+  // Top-down view of a room. Turn the device (drag) and the memories inside your field of view light up, like LUME's GPS bearings.
+  const MEM = [[18, 'Swift Mumbai at Paytm', 'Mumbai, with the club'], [96, 'First day at Parul', 'Vadodara campus'], [158, 'GDG Baroda meetup', 'a Sunday in Vadodara'],
+    [232, 'WWDC26 submission night', 'my desk, 2 a.m.'], [298, 'Apple Lab, club night', 'Swift Coding Club']];
+  const room = $('#room'), placard = $('#placard'), C = 200, RR = 150;
+  let heading = 0, dragging = false, idle = true;
+  const pol = (deg, r) => [C + Math.sin(deg * Math.PI / 180) * r, C - Math.cos(deg * Math.PI / 180) * r];
+  room.innerHTML = `<circle class="ring" cx="${C}" cy="${C}" r="${RR}"/><circle class="ring" cx="${C}" cy="${C}" r="${RR * .55}"/>
+    <path class="cone" id="cone"/><text class="north" x="${C}" y="${C - RR - 14}" text-anchor="middle">N</text>` +
+    MEM.map(([b, n], i) => { const [x, y] = pol(b, RR); return `<g class="pod" data-i="${i}"><rect x="${x - 9}" y="${y - 9}" width="18" height="18" rx="3"/></g>`; }).join('') +
+    `<circle class="you" cx="${C}" cy="${C}" r="8"/>`;
+  const FOV = 30;
+  function look(h) {
+    heading = (h + 360) % 360;
+    const [ax, ay] = pol(heading - FOV, RR + 30), [bx, by] = pol(heading + FOV, RR + 30);
+    $('#cone').setAttribute('d', `M${C},${C} L${ax},${ay} A${RR + 30},${RR + 30} 0 0 1 ${bx},${by} Z`);
+    let best = -1, bd = 999;
+    MEM.forEach(([b], i) => { const d = Math.abs(((b - heading + 540) % 360) - 180); room.querySelector(`.pod[data-i="${i}"]`).classList.toggle('lit', d <= FOV); if (d <= FOV && d < bd) { bd = d; best = i; } });
+    $('#hdg').textContent = String(Math.round(heading)).padStart(3, '0') + '°';
+    placard.innerHTML = best < 0 ? '<span class="kind">nothing here</span><p>Turn towards a memory.</p>'
+      : `<span class="kind">memory · bearing ${String(MEM[best][0]).padStart(3, '0')}°</span><h3>${MEM[best][1]}</h3><p>${MEM[best][2]}</p>`;
   }
-  plot.addEventListener('click', e => { const t = e.target.closest('.pt'); if (t) select(t.dataset.id); });
-  plot.addEventListener('pointerover', e => { const t = e.target.closest('.pt'); if (t && e.pointerType === 'mouse') select(t.dataset.id); });
-  plot.addEventListener('focusin', e => { const t = e.target.closest('.pt'); if (t) select(t.dataset.id); });
-  select('hound');
+  const angleAt = e => { const r = room.getBoundingClientRect(); return Math.atan2(e.clientX - r.left - r.width / 2, -(e.clientY - r.top - r.height / 2)) * 180 / Math.PI; };
+  room.addEventListener('pointerdown', e => { dragging = true; idle = false; room.setPointerCapture(e.pointerId); look(angleAt(e)); });
+  room.addEventListener('pointermove', e => { if (dragging || e.pointerType === 'mouse') { idle = false; look(angleAt(e)); } });
+  room.addEventListener('pointerup', () => dragging = false);
+  room.addEventListener('pointerleave', () => { dragging = false; idle = true; });
+  look(10);
+  if (!reduce) (function spin() { if (idle && room.getBoundingClientRect().top < innerHeight) look(heading + .25); requestAnimationFrame(spin); })();
+
+  /* ---------- project network: skills -> themes -> projects ---------- */
+  // Every public repo worth showing is an output neuron. Skill->theme weights are not hand-picked:
+  // they are the sum of the weights of the projects that use that skill inside that theme.
+  const SKILLS = [
+    ['agents', 'LLM agents + MCP'], ['graphs', 'Graphs + Cypher'], ['python', 'Python'], ['web', 'Web + backend'],
+    ['swift', 'Swift + SwiftUI'], ['ar', 'ARKit + RealityKit'], ['ondevice', 'On-device ML'], ['kotlin', 'Kotlin + Android']
+  ];
+  const THEMES = [
+    ['agents', 'Agents that show their work', "Agents I build have to leave receipts: the query that ran, the evidence it cited, a reviewer that can say no. Hound, IntelliCredit AI and the code-review environment all live here."],
+    ['money', 'Money + risk', "Fintech where a wrong answer costs someone: money laundering and credit risk. Hound and IntelliCredit AI both turn messy financial data into a decision a human can check."],
+    ['memory', 'Memory', "The thread that joins my two biggest projects. Hound remembers every case inside the graph, attached to the people and accounts it touched. LUME turns your own memories into a museum you can walk through. The Room's journal sits close by."],
+    ['care', 'Care + wellbeing', "Tech for how people feel and get around: mental wellness apps, an emotion-aware companion, offline navigation for blind users, and a story you draw yourself into."],
+    ['campus', 'Campus tools', "Things built for Parul University and the Swift Coding Club: face-recognition attendance for the Apple Lab, a WhatsApp bot for clubs, and Puma for campus events."],
+    ['learning', 'Learning in public', "Teaching Swift to beginners, and logging my own path into AI research one phase at a time."]
+  ];
+  const GH = r => 'https://github.com/manav-Mnv/' + r;
+  const PROJECTS = [
+    { id: 'hound', n: 'Hound', w: 1, star: true, th: ['agents', 'money', 'memory'], sk: ['agents', 'graphs', 'python', 'web'],
+      tag: 'Graph Hacks 2026 · Team Musketeer',
+      what: 'AML investigation agents on FalkorDB. They follow the money through a graph, remember every case, and write suspicious activity reports where every sentence cites a Cypher query.',
+      why: 'Banks drown in alerts, and almost 95% of them end as false positives. The answers analysts need are about connections, which is exactly what a graph stores.',
+      proof: 'On 71 synthetic alerts in offline mode: all 41 false positives closed with a cited reason, 5 of 5 laundering schemes escalated, and 5 accounts found that no rule flagged.',
+      stack: 'Python · FastAPI · FalkorDB · Cypher · MCP · React + Cytoscape',
+      links: [['code', GH('hound-aml')], ['live demo', 'https://hound-99l2.onrender.com'], ['replay below', '#hound']] },
+    { id: 'lume', n: 'LUME', w: 1, star: true, th: ['memory', 'care'], sk: ['swift', 'ar'],
+      tag: 'Swift Student Challenge',
+      what: 'Light Unveils Memory Environment: an AR journal. Each memory you save, with a photo, a story and a GPS pin, becomes a 3D museum stand placed around you in the room.',
+      why: 'Diaries are flat. LUME lets you physically walk down memory lane, with each memory standing in the direction where it actually happened.',
+      proof: 'World tracking aligned to true north, so GPS bearings map straight into the room. Podiums sit on the detected floor and can be moved, rotated and resized.',
+      stack: 'SwiftUI · ARKit · RealityKit · MapKit · CoreLocation',
+      links: [['code', GH('L-U-M-E')], ['try the compass', '#lume']] },
+    { id: 'frag', n: 'Fragments', w: .7, th: ['care'], sk: ['swift'], tag: 'WWDC26 Swift Student Challenge',
+      what: 'An interactive, narrative-driven App Playground. You draw yourself into each scene with PencilKit while the story plays around you.',
+      why: 'Built to express, not to impress. The question behind it: what if healing feels like participation?',
+      stack: 'SwiftUI · PencilKit · AVFoundation · MVVM', links: [['code', GH('Fragments')], ['draw it', '#fragments']] },
+    { id: 'room', n: 'The Room', w: .6, th: ['care', 'memory'], sk: ['swift', 'ondevice', 'web'], tag: 'IndeHub Hackathon 2026',
+      what: 'A free, privacy-first mental wellness iOS app for Indian students: mood check-ins, an on-device AI journal, a moderated anonymous feed and Breathe Together.',
+      why: 'Students need somewhere private to check in with themselves. The journal AI runs on the phone, so nothing personal leaves it.',
+      stack: 'SwiftUI · WidgetKit · MultipeerConnectivity · FastAPI', links: [['code', GH('the-room')]] },
+    { id: 'credit', n: 'IntelliCredit AI', w: .6, th: ['money', 'agents'], sk: ['python', 'agents', 'web'], tag: 'Hackathon project',
+      what: 'Turns financial documents (PDF, XLSX, DOCX) into credit appraisal memos, using a 4-layer risk engine, research agents and XGBoost.',
+      why: 'Credit appraisal means reading piles of documents by hand. This lays out the risk reasoning in one memo a credit officer can check.',
+      stack: 'Python · XGBoost · research agents · Next.js · Docker', links: [['code', GH('intelli-credit-ai-1.0')], ['landing page', GH('ICT-webpage')]] },
+    { id: 'review', n: 'Code Review OpenEnv', w: .55, th: ['agents', 'learning'], sk: ['python', 'agents'], tag: 'Hackathon project',
+      what: 'A reinforcement-learning environment where AI agents learn to find bugs, rate their severity and suggest fixes, the way a senior reviewer would.',
+      why: 'To get agents that review code well, you need somewhere to train and score them. This is that place.',
+      stack: 'Python · Docker · OpenEnv', links: [['code', GH('code-review-env-')]] },
+    { id: 'puma', n: 'Puma (EDGE)', w: .55, th: ['campus'], sk: ['web'], tag: 'In development',
+      what: 'A Luma-style campus event platform for Parul University, with an Expo app and a Next.js web foundation on Supabase.',
+      why: 'Campus events deserve one proper place to discover them and show up, instead of scattered posters and group chats.',
+      stack: 'Expo · TypeScript · Supabase · Next.js 16 · Firebase', links: [['app', GH('puma')], ['web', GH('edge-web')]] },
+    { id: 'lab', n: 'Apple Lab kiosk', w: .55, th: ['campus'], sk: ['swift', 'ondevice', 'web'], tag: 'Swift Coding Club · in development',
+      what: 'Face-recognition check-in and check-out for the Swift Coding Club Apple Lab, with on-device FaceNet, Supabase and a Next.js admin portal. Grew out of two earlier attendance systems.',
+      why: 'The club lab needed attendance that runs itself, and it had to cost $0 to host.',
+      stack: 'SwiftUI · Core ML (FaceNet) · Supabase · Next.js · Flask (Swifters)', links: [['kiosk', GH('aatce-apple-lab')], ['Swifters', GH('swifters')], ['SwiftAttend', GH('attendance')]] },
+    { id: 'echo', n: 'EchoNav', w: .45, th: ['care'], sk: ['kotlin', 'ondevice'], tag: 'Prototype',
+      what: 'An offline assistant that helps blind users navigate, with real-time object detection, voice feedback and haptic cues.',
+      why: 'Help with getting around should work without a signal and without sending a camera feed anywhere.',
+      stack: 'Kotlin · Android · on-device object detection', links: [['code', GH('EchoNav')]] },
+    { id: 'po', n: 'PO', w: .45, th: ['care'], sk: ['kotlin', 'ondevice'], tag: 'Prototype',
+      what: 'An on-device AI companion for Android. DistilBERT detects emotion on TensorFlow Lite, and intent detection shapes the tone of each reply.',
+      why: 'A companion should notice how you feel, and that should stay on your phone.',
+      stack: 'Kotlin · Jetpack Compose · TensorFlow Lite · Hilt · Room', links: [['code', GH('PO')]] },
+    { id: 'bloom', n: 'BLOOM', w: .4, th: ['care'], sk: ['web', 'agents'], tag: 'Hackathon project',
+      what: 'A mental wellness web app with an AI companion, mood check-ins, a journal, anonymous confessions and reminders.',
+      why: 'It speaks English and Hindi, the way students actually talk.',
+      stack: 'React · TypeScript · Vite · shadcn/ui', links: [['code', GH('bloom-v1.2')]] },
+    { id: 'steps', n: 'SwiftSteps', w: .5, th: ['learning'], sk: ['swift'], tag: 'Swift Student Challenge 2026',
+      what: 'A calm, gamified app that teaches Swift and SwiftUI to beginners, with levels, badges and an in-app code editor. There is also a retro pixel-art Playground edition.',
+      why: 'Learning to code should feel calm, not scary.',
+      stack: 'SwiftUI · MVVM · Swift Playgrounds', links: [['app', GH('swift-2026-1')], ['playground', GH('SwiftStepss.swiftpm')]] },
+    { id: 'routiner', n: 'Routiner', w: .4, th: ['learning', 'campus'], sk: ['swift'], tag: 'Teaching course',
+      what: 'A SwiftUI habit tracker built as a 6-week teaching course, with commented MVVM source, a teaching plan and a lesson guide.',
+      why: 'The club needed a real app to teach from, not toy snippets.',
+      stack: 'SwiftUI · MVVM', links: [['code', GH('routiner')]] },
+    { id: 'hub', n: 'Hub bot', w: .35, th: ['campus'], sk: ['web'], tag: 'Prototype',
+      what: 'A WhatsApp bot that lets students browse every Tinkering Hub club through interactive menus.',
+      why: 'Students already live on WhatsApp, so the clubs come to them there.',
+      stack: 'Node.js · Express · WhatsApp Cloud API', links: [['code', GH('whatsapp-hub-bot')]] },
+    { id: 'research', n: 'AI research log', w: .45, th: ['learning'], sk: ['python'], tag: 'In progress',
+      what: 'A public log of my path into AI research: setup, learning, experiments and notes, one phase at a time.',
+      why: 'Learning in public keeps me honest, and it might help the next student starting out.',
+      stack: 'Python · PyTorch on Intel Arc (XPU)', links: [['log', GH('ai-research-journey')]] }
+  ];
+  const ALSO = [['suinft', 'Sui NFT loyalty cards'], ['PatternFusionX', 'programming patterns trainer'], ['proactive-node-clone', 'AI marketing site'],
+    ['Book', 'book showcase site'], ['M-N-V---webpage', 'books + thoughts site'], ['dev-portfolio', 'first portfolio'], ['buttons', 'Chaos Button']];
+  const pn = $('#pn'), pcard = $('#pcard'), pchips = $('#pchips');
+  // skill -> theme weights, summed from the projects that sit on both
+  const SW = {};
+  PROJECTS.forEach(p => p.sk.forEach(s => p.th.forEach(t => { const k = s + '>' + t; SW[k] = (SW[k] || 0) + p.w; })));
+  const SHORT = { agents: 'LLM', graphs: 'Graphs', python: 'Python', web: 'Web', swift: 'Swift', ar: 'AR', ondevice: 'ML', kotlin: 'Kotlin' };
+  let nodes = {}, narrow = false;
+  function layout() {
+    narrow = innerWidth < 700;
+    const W = narrow ? 400 : 1000, H = narrow ? 610 : 680;
+    pn.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const spread = (n, a, b) => i => n === 1 ? (a + b) / 2 : a + i * (b - a) / (n - 1);
+    nodes = {};
+    if (!narrow) {
+      const ys = spread(SKILLS.length, 70, H - 40), yt = spread(THEMES.length, 90, H - 60), yp = spread(PROJECTS.length, 60, H - 24);
+      SKILLS.forEach(([id], i) => nodes['s:' + id] = { x: 210, y: ys(i) });
+      THEMES.forEach(([id], i) => nodes['t:' + id] = { x: 480, y: yt(i) });
+      PROJECTS.forEach((p, i) => nodes['p:' + p.id] = { x: 740, y: yp(i) });
+    } else {                                            // phones: layers become rows, top to bottom
+      const xs = spread(SKILLS.length, 34, W - 34), xt = spread(THEMES.length, 48, W - 48), xp = spread(PROJECTS.length, 18, W - 18);
+      SKILLS.forEach(([id], i) => nodes['s:' + id] = { x: xs(i), y: 100 });
+      THEMES.forEach(([id], i) => nodes['t:' + id] = { x: xt(i), y: 330 });
+      PROJECTS.forEach((p, i) => nodes['p:' + p.id] = { x: xp(i), y: 520 });
+    }
+    draw();
+  }
+  const curve = (a, b) => narrow
+    ? `M${a.x},${a.y} C${a.x},${(a.y + b.y) / 2} ${b.x},${(a.y + b.y) / 2} ${b.x},${b.y}`
+    : `M${a.x},${a.y} C${(a.x + b.x) / 2},${a.y} ${(a.x + b.x) / 2},${b.y} ${b.x},${b.y}`;
+  function draw() {
+    let e = '', n = '';
+        n += narrow
+      ? `<text class="layer" x="8" y="22">INPUT · SKILLS</text><text class="layer" x="8" y="258">HIDDEN · THEMES</text><text class="layer" x="8" y="602">OUTPUT · PROJECTS</text>`
+      : `<text class="layer" x="210" y="28" text-anchor="end">INPUT · SKILLS</text><text class="layer" x="480" y="28" text-anchor="middle">HIDDEN · THEMES</text><text class="layer" x="740" y="28">OUTPUT · PROJECTS</text>`;
+    Object.entries(SW).forEach(([k, w]) => { const [s, t] = k.split('>');
+      e += `<path class="e" data-s="${s}" data-t="${t}" d="${curve(nodes['s:' + s], nodes['t:' + t])}" stroke-width="${(.8 + w * 1.6).toFixed(2)}"/>`; });
+    PROJECTS.forEach(p => p.th.forEach(t => {
+      e += `<path class="e" data-t="${t}" data-p="${p.id}" d="${curve(nodes['t:' + t], nodes['p:' + p.id])}" stroke-width="${(.8 + p.w * 2.2).toFixed(2)}"/>`; }));
+    SKILLS.forEach(([id, label]) => { const c = nodes['s:' + id];
+      n += `<g class="nd in" data-k="s" data-id="${id}" tabindex="0" role="button" aria-label="${label}"><circle cx="${c.x}" cy="${c.y}" r="9"/>` +
+        (narrow ? `<text x="${c.x}" y="${SKILLS.findIndex(x => x[0] === id) % 2 ? 76 : 56}" text-anchor="middle" class="sm">${SHORT[id]}</text>` : `<text x="${c.x - 18}" y="${c.y + 4}" text-anchor="end">${label}</text>`) + '</g>'; });
+    THEMES.forEach(([id, label]) => { const c = nodes['t:' + id];
+      n += `<g class="nd th" data-k="t" data-id="${id}" tabindex="0" role="button" aria-label="${label}"><circle cx="${c.x}" cy="${c.y}" r="11"/>` +
+        (narrow ? `<text x="${c.x}" y="${c.y + (THEMES.findIndex(t => t[0] === id) % 2 ? 34 : -20)}" text-anchor="middle" class="sm">${label.split(' ')[0]}</text>`
+                : `<text x="${c.x}" y="${c.y - 18}" text-anchor="middle">${label}</text>`) + '</g>'; });
+    PROJECTS.forEach((p, i) => { const c = nodes['p:' + p.id], r = narrow ? 5 + p.w * 5 : 6 + p.w * 8;
+      n += `<g class="nd pr${p.star ? ' star' : ''}" data-k="p" data-id="${p.id}" tabindex="0" role="button" aria-label="${p.n}"><circle cx="${c.x}" cy="${c.y}" r="${r}"/>` +
+        (narrow ? (p.star ? `<text x="${c.x - 8}" y="${c.y + 30 + i * 20}" class="sm">${p.n}</text>` : '') : `<text x="${c.x + r + 10}" y="${c.y + 5}">${p.n}</text>`) + '</g>'; });
+    pn.innerHTML = `<g id="pe">${e}</g><g id="pp"></g>${n}`;
+    if (cur) pnPick(cur.k, cur.id);
+  }
+  let cur = null;
+  function pnPick(k, id) {
+    cur = { k, id };
+    const hotN = new Set();
+    let edgeOk;
+    if (k === 'p') {
+      const p = PROJECTS.find(q => q.id === id);
+      hotN.add('p:' + id); p.th.forEach(t => hotN.add('t:' + t)); p.sk.forEach(s => hotN.add('s:' + s));
+      edgeOk = d => d.p ? d.p === id : (p.sk.includes(d.s) && p.th.includes(d.t));
+      pcard.innerHTML = `<span class="kind">${p.star ? 'featured · ' : ''}${p.tag}</span><h3>${p.n}</h3><p>${p.what}</p>
+        <p class="why"><b>Why:</b> ${p.why}</p>${p.proof ? `<p class="why"><b>Proof:</b> ${p.proof}</p>` : ''}
+        <span class="nbrs">${p.stack}</span>
+        <span class="nbrs">fires through: ${p.th.map(t => THEMES.find(x => x[0] === t)[1]).join(' · ')}</span>
+        <div class="links">${p.links.map(([l, u]) => `<a class="chip" href="${u}"${u.startsWith('http') ? ' target="_blank" rel="noopener"' : ''}>${l} →</a>`).join('')}</div>`;
+    } else if (k === 't') {
+      const t = THEMES.find(x => x[0] === id), ps = PROJECTS.filter(p => p.th.includes(id));
+      hotN.add('t:' + id); ps.forEach(p => { hotN.add('p:' + p.id); p.sk.forEach(s => hotN.add('s:' + s)); });
+      edgeOk = d => d.t === id;
+      pcard.innerHTML = `<span class="kind">hidden unit</span><h3>${t[1]}</h3><p>${t[2]}</p><span class="nbrs">${ps.length} projects: ${ps.map(p => p.n).join(' · ')}</span>`;
+    } else {
+      const s = SKILLS.find(x => x[0] === id), ps = PROJECTS.filter(p => p.sk.includes(id));
+      hotN.add('s:' + id); ps.forEach(p => { hotN.add('p:' + p.id); p.th.forEach(t => hotN.add('t:' + t)); });
+      edgeOk = d => d.p ? (ps.some(p => p.id === d.p)) : d.s === id;
+      pcard.innerHTML = `<span class="kind">input</span><h3>${s[1]}</h3><p>Used in ${ps.length} project${ps.length > 1 ? 's' : ''}: ${ps.map(p => p.n).join(', ')}.</p>
+        <span class="nbrs">edge weight = sum of the projects that use it in each theme</span>`;
+    }
+    pn.classList.add('focus');
+    pn.querySelectorAll('.nd').forEach(g => { const key = g.dataset.k + ':' + g.dataset.id; g.classList.toggle('hot', hotN.has(key)); g.classList.toggle('sel', g.dataset.k === k && g.dataset.id === id); });
+    pn.querySelectorAll('.e').forEach(p => p.classList.toggle('hot', edgeOk(p.dataset)));
+    pchips.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', k === 'p' && b.dataset.id === id));
+  }
+  pchips.innerHTML = PROJECTS.map(p => `<button type="button" class="chip${p.star ? ' star' : ''}" data-id="${p.id}" aria-pressed="false">${p.n}</button>`).join('');
+  pchips.addEventListener('click', e => { const b = e.target.closest('button'); if (b) pnPick('p', b.dataset.id); });
+  const nodeOf = e => e.target.closest && e.target.closest('.nd');
+  pn.addEventListener('click', e => { const g = nodeOf(e); if (g) pnPick(g.dataset.k, g.dataset.id); });
+  pn.addEventListener('pointerover', e => { const g = nodeOf(e); if (g && e.pointerType === 'mouse') pnPick(g.dataset.k, g.dataset.id); });
+  pn.addEventListener('keydown', e => { const g = nodeOf(e); if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pnPick(g.dataset.k, g.dataset.id); } });
+  $('#also').innerHTML = 'Also on GitHub: ' + ALSO.map(([r, d]) => `<a href="${GH(r)}" target="_blank" rel="noopener">${r}</a> (${d})`).join(' · ') + '. Learning repos and forks are left out.';
+
+  // forward pass: a pulse runs every edge, inputs first, and the strongest output lights last
+  async function fire() {
+    if (reduce) { pnPick('p', 'hound'); return; }
+    pn.classList.remove('focus'); pn.querySelectorAll('.hot,.sel').forEach(x => x.classList.remove('hot', 'sel'));
+    const layerPaths = [[...pn.querySelectorAll('.e[data-s]')], [...pn.querySelectorAll('.e[data-p]')]], pp = $('#pp');
+    for (const paths of layerPaths) {
+      const dots = paths.map(p => { const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle'); c.setAttribute('r', 3.2); c.setAttribute('class', 'pulse'); pp.appendChild(c); return [p, c, p.getTotalLength()]; });
+      const t0 = performance.now();
+      await new Promise(res => { (function step(now) { const f = Math.min(1, (now - t0) / 900);
+        dots.forEach(([p, c, L]) => { const pt = p.getPointAtLength(L * f); c.setAttribute('cx', pt.x); c.setAttribute('cy', pt.y); });
+        f < 1 ? requestAnimationFrame(step) : res(); })(t0); });
+      dots.forEach(([, c]) => c.remove());
+    }
+    pnPick('p', 'hound');
+  }
+  $('#fire').addEventListener('click', fire);
+  addEventListener('resize', () => { if ((innerWidth < 700) !== narrow) layout(); });
+  layout(); pnPick('p', 'hound');
 
   /* ---------- git log ---------- */
   const commits = [
-    ['*', 'a1f3c9e', '<span class="ref">(HEAD -> main)</span> build mnv.model, this portfolio', 'Diffusion hero, attention map, latent space. Built in public.'],
+    ['*', 'a1f3c9e', '<span class="ref">(HEAD -> main)</span> build mnv.model, this portfolio', 'Diffusion hero, attention map, and a neural network of every project. Built in public.'],
     ['*', '9c4e2d7', 'trip: Vadodara → Mumbai for Swift Mumbai', 'Went with the Swift Coding Club crew and our mentor to the meetup at the Paytm office. Came back with a notebook full of ideas.'],
     ['*', '8b10f3a', 'start AI/ML research', 'Learning the fundamentals and digging for real research gaps.'],
     ['*', '7e55a01', 'wip: GSoC 2026 prep', "No merged PR yet. Still pushing, still learning."],
+    ['*', '7f3e810', 'hackathon season: The Room, IntelliCredit AI, Code Review OpenEnv', 'A mental wellness app at IndeHub 2026, a credit-risk engine with research agents, and an RL environment that teaches agents to review code.'],
+    ['*', '7d9a2c3', 'feat: LUME, an AR journal for the Swift Student Challenge', 'Memories become 3D museum stands placed by where they happened. ARKit, RealityKit, MapKit.'],
     ['*', '7d21b04', 'ship Hound at WeMakeDevs × FalkorDB Graph Hacks 2026', 'Team Musketeer. Multi-agent AML investigation on a graph database, with a live demo and 71 synthetic test alerts.'],
     ['*', '6a0c9e2', 'feat: Fragments for the WWDC26 Swift Student Challenge', 'SwiftUI, PencilKit and AVFoundation. Built to express, not to impress.'],
     ['|\\', '3b9f117', 'merge: Swift Coding Club Parul University', 'Joined, then started helping manage it. Also GDG Baroda meetups and SwiftDidLoad.'],
@@ -700,6 +965,12 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
     [/hound|aml|launder|fraud|graph/i,
       "Hound is an anti-money-laundering tool my team built for WeMakeDevs × FalkorDB Graph Hacks 2026. AI agents trace suspicious money through a graph database and draft an evidence-backed report. A human makes the final decision.",
       "Hound = AI jasoos for banks. Paisa kahan se kahan gaya, graph mein trace karta hai, report likhta hai with proof. Final faisla insaan ka."],
+    [/lume|ar journal|memory|museum|arkit/i,
+      "LUME (Light Unveils Memory Environment) is an AR journal I built for the Swift Student Challenge. Each memory becomes a 3D museum stand placed in the direction where it happened, using ARKit, RealityKit and GPS bearings.",
+      "LUME = diary jisme tum chal sakte ho. Har memory ek 3D museum stand ban jaati hai, us direction mein jahan woh hua tha. ARKit + RealityKit."],
+    [/project|built|portfolio|repos|github/i,
+      "Featured: Hound and LUME. Also Fragments, The Room, IntelliCredit AI, Code Review OpenEnv, Puma, the Apple Lab kiosk, EchoNav, PO, BLOOM, SwiftSteps and more. Scroll to the network to see how they connect.",
+      "Sabse bade: Hound aur LUME. Baaki network section mein dekho, sab connected hai."],
     [/fragment|wwdc|swift student|pencil/i,
       "Fragments is my WWDC26 Swift Student Challenge entry: an interactive story where you draw yourself into each scene with PencilKit. Built with SwiftUI and AVFoundation.",
       "Fragments meri WWDC26 entry hai. Story mein tum khud ko draw karte ho Apple Pencil se. Thoda emotional project hai, honestly."],
@@ -723,19 +994,19 @@ footer { font: 400 12px/1.6 var(--mono); color: var(--muted); display: flex; gap
       "Manav here, ya mnv. Student, builder, part-time money-launderer-catcher."]
   ];
   const answer = q => { const hit = R.find(([re]) => re.test(q)); if (hit) return mode === 'pro' ? hit[1] : hit[2];
-    return mode === 'pro' ? "I don't have a good answer for that one yet. Try asking about Hound or Fragments." : "yeh mere training data mein nahi tha. Hound ya Fragments ke baare mein pucho."; };
+    return mode === 'pro' ? "I don't have a good answer for that one yet. Try asking about Hound or LUME." : "yeh mere training data mein nahi tha. Hound ya LUME ke baare mein pucho."; };
   const ask = q => { if (q.trim()) streamInto($('#outText'), answer(q), 50); };
   $('#askForm').addEventListener('submit', e => { e.preventDefault(); ask($('#q').value); });
   document.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', () => { $('#q').value = b.dataset.q; ask(b.dataset.q); }));
 
   /* ---------- router network ---------- */
   const outs = [
-    { n: 'Hound', href: '#hound' }, { n: 'Fragments', href: '#fragments' }, { n: 'Work map', href: '#latent' },
+    { n: 'Hound', href: '#hound' }, { n: 'Fragments', href: '#fragments' }, { n: 'Project network', href: '#latent' },
     { n: 'git log', href: '#log' }, { n: 'Prompt me', href: '#inference' }
   ];
   const route = [
     { o: 0, m: 'pro', v: "Start with Hound: AI agents that investigate money laundering on a graph database, shipped at a hackathon with my team." },
-    { o: 2, m: 'pro', v: "Start with the work map: every skill and project I have, and how they connect." },
+    { o: 2, m: 'pro', v: "Start with the project network: every public project of mine, wired like a neural network." },
     { o: 1, m: 'pro', v: "Start with Fragments: a story you draw yourself into. It's built for feelings, not features." },
     { o: 3, m: 'dost', v: "Start with git log: how a fresher from Parul ended up shipping hackathon projects. You can do it too, bhai." },
     { o: 4, m: 'dost', v: "Start with Prompt me: ask my mini model anything. Hinglish bhi chalega." }

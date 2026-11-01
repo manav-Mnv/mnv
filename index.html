@@ -372,7 +372,7 @@ footer { position: absolute; left: 0; right: 0; bottom: calc(18px + env(safe-are
     <div>
       <div class="mono fade">// the lab</div>
       <h2 class="rv"><span class="line"><span>Step inside</span></span><span class="line"><span>the <span class="it">model</span></span></span></h2>
-      <p class="fade">mnv.model is my portfolio rebuilt as a neural network. You can route yourself through it, watch attention light up, replay a Hound investigation, and draw in Fragments.</p>
+      <p class="fade">mnv.model is my portfolio rebuilt as a neural network. You can route yourself through it, watch attention light up, replay a Hound investigation, turn around inside LUME, and see every project I have built wired up as one network.</p>
       <a class="btn fade" href="./model/" data-cur>Open mnv.model <span class="arr">→</span></a>
     </div>
     <div class="portal fade"><canvas id="diffuse"></canvas><span class="t mono">diffusion sample · move to add noise</span><span class="step mono" id="dstep">t = 1000</span>
@@ -660,17 +660,17 @@ function talkField(canvas) {
 /* ---------- work cards, drawn in code since there are no screenshots ---------- */
 const WORK = [
   { name: 'Hound', tag: 'AML agents · FalkorDB · 2026', href: 'https://github.com/manav-Mnv/hound-aml',
-    desc: 'A multi-agent anti-money-laundering tool on FalkorDB. It replays each investigation hop by hop with the read-only Cypher that ran. Built with Team Musketeer at Graph Hacks 2026.', art: houndArt },
+    desc: 'AML investigation agents on FalkorDB. They follow the money through a graph, remember every case, and write reports where every sentence cites a Cypher query. Built with Team Musketeer at Graph Hacks 2026.', art: houndArt },
+  { name: 'LUME', tag: 'AR journal · Swift Student Challenge', href: 'https://github.com/manav-Mnv/L-U-M-E',
+    desc: 'Light Unveils Memory Environment. Each memory, with a photo, a story and a GPS pin, becomes a 3D museum stand placed around you in the direction where it happened.', art: lumeArt },
   { name: 'Fragments', tag: 'WWDC26 · SwiftUI · PencilKit', href: 'https://github.com/manav-Mnv/Fragments',
     desc: 'My Swift Student Challenge app: an interactive story where you draw yourself in, and every stroke moves the narrative.', art: fragArt },
-  { name: 'mnv.model', tag: 'Portfolio as a network', href: './model/',
-    desc: 'This site\'s lab. My portfolio rebuilt as a neural network, with a diffusion hero, attention arcs and a latent map of my work.', art: modelArt },
-  { name: 'FalkorDB notes', tag: 'Graph DB · edge cases', href: 'https://github.com/manav-Mnv',
-    desc: 'Field notes from pushing FalkorDB 6.0 during the hackathon: the queries that surprised me and what actually worked.', art: termArt },
-  { name: 'Swift Club', tag: 'Community · Parul University', href: 'https://in.linkedin.com/in/mnvdev',
-    desc: 'Helping run the Swift Coding Club at Parul University, and taking the club to meetups like Swift Mumbai at Paytm.', art: clubArt },
-  { name: 'Research', tag: 'AI/ML · GSoC 2026', href: 'https://in.linkedin.com/in/mnvdev',
-    desc: 'Reading, reproducing and hunting research gaps in AI/ML, while getting ready for Google Summer of Code.', art: lossArt },
+  { name: 'The Room', tag: 'iOS · IndeHub Hackathon 2026', href: 'https://github.com/manav-Mnv/the-room',
+    desc: 'A free, privacy-first mental wellness app for Indian students: mood check-ins, an on-device AI journal, a moderated anonymous feed and Breathe Together.', art: roomArt },
+  { name: 'IntelliCredit AI', tag: 'Fintech · research agents · XGBoost', href: 'https://github.com/manav-Mnv/intelli-credit-ai-1.0',
+    desc: 'Turns financial documents into credit appraisal memos with a 4-layer risk engine, research agents and XGBoost.', art: creditArt },
+  { name: 'All projects', tag: 'mnv.model · the network', href: './model/#latent',
+    desc: 'Every public project of mine, from Puma and the Apple Lab kiosk to EchoNav and SwiftSteps, wired up like a neural network inside mnv.model.', art: modelArt },
 ];
 function houndArt() {
   const r = rnd(7), n = Array.from({ length: 18 }, () => [40 + r() * 320, 40 + r() * 160]);
@@ -695,26 +695,32 @@ function modelArt() {
   return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><rect width="400" height="260" fill="#070d1c"/>${s}
     <text x="200" y="160" text-anchor="middle" fill="#eaf2ff" font-family="Doto, monospace" font-weight="900" font-size="110">mnv</text></svg>`;
 }
-function termArt() {
-  const L = ['$ GRAPH.RO_QUERY aml', '  "MATCH (a:Account {flag:true})', '   -[:SENT*1..3]->(b)', '   RETURN b.id, count(*)"', '', '71 alerts · 0 writes', '// edge case: var-length + filter', '// note: RO_QUERY or nothing'];
+function lumeArt() {
+  const pods = [[18, 92], [96, 100], [158, 88], [232, 96], [298, 90]].map(([b, r]) => { const t = b * Math.PI / 180; return [200 + Math.sin(t) * r, 130 - Math.cos(t) * r * .9]; });
+  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><rect width="400" height="260" fill="#070d1c"/>
+    <ellipse cx="200" cy="130" rx="100" ry="90" fill="none" stroke="#1f2d50" stroke-dasharray="3 5"/>
+    <g><path d="M200 130 L170 30 A105 105 0 0 1 240 34 Z" fill="#8fd3ff" opacity=".18"/><animateTransform attributeName="transform" type="rotate" from="0 200 130" to="360 200 130" dur="12s" repeatCount="indefinite"/></g>
+    ${pods.map(([x, y], i) => `<rect x="${x - 8}" y="${y - 8}" width="16" height="16" rx="3" fill="${i ? '#0d1730' : '#ff7a45'}" stroke="${i ? '#8ea3c7' : '#ff7a45'}"/>`).join('')}
+    <circle cx="200" cy="130" r="7" fill="#3d8bff"/>
+    <text x="200" y="26" text-anchor="middle" fill="#ff7a45" font-family="Geist Mono, monospace" font-size="11">N</text></svg>`;
+}
+function roomArt() {
+  const r = rnd(11); let dots = '';
+  for (let i = 0; i < 7; i++) dots += `<circle cx="${60 + i * 46}" cy="226" r="7" fill="${['#3d8bff', '#8fd3ff', '#5ce1e6', '#ff7a45'][Math.floor(r() * 4)]}"/>`;
+  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><rect width="400" height="260" fill="#0d1730"/>
+    <circle cx="200" cy="110" r="46" fill="none" stroke="#8fd3ff" stroke-width="2"><animate attributeName="r" values="40;70;40" dur="8s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;.4;1" dur="8s" repeatCount="indefinite"/></circle>
+    <circle cx="200" cy="110" r="30" fill="#3d8bff" opacity=".35"/>
+    <text x="200" y="116" text-anchor="middle" fill="#eaf2ff" font-family="Instrument Serif, Georgia, serif" font-style="italic" font-size="22">breathe</text>
+    ${dots}</svg>`;
+}
+function creditArt() {
+  const bars = [62, 118, 84, 150];
   return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><rect width="400" height="260" fill="#04070f"/>
-    <circle cx="20" cy="18" r="5" fill="#ff7a45"/><circle cx="36" cy="18" r="5" fill="#3d8bff"/><circle cx="52" cy="18" r="5" fill="#5ce1e6"/>
-    ${L.map((l, i) => `<text x="20" y="${52 + i * 22}" fill="${l.startsWith('//') ? '#8ea3c7' : l.startsWith('$') ? '#8fd3ff' : '#eaf2ff'}" font-family="Geist Mono, monospace" font-size="12">${l.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</text>`).join('')}
-    <rect x="186" y="150" width="8" height="14" fill="#8fd3ff"><animate attributeName="opacity" values="1;0;1" dur="1s" calcMode="discrete" repeatCount="indefinite"/></rect></svg>`;
-}
-function clubArt() {
-  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><rect width="400" height="260" fill="#ff7a45"/>
-    <text x="22" y="122" fill="#070d1c" font-family="Geist, Arial, sans-serif" font-weight="650" font-size="84" letter-spacing="-5">Swift</text>
-    <text x="24" y="188" fill="#070d1c" font-family="Instrument Serif, Georgia, serif" font-style="italic" font-size="78" letter-spacing="-2">club</text>
-    <text x="26" y="226" fill="#070d1c" font-family="Geist Mono, monospace" font-size="11">SWIFTDIDLOAD · SWIFT MUMBAI @ PAYTM</text></svg>`;
-}
-function lossArt() {
-  let d = 'M20 40'; for (let x = 20; x <= 380; x += 6) { const t = (x - 20) / 360; d += ` L${x} ${(40 + 170 * (1 - Math.exp(-t * 4)) + Math.sin(x * .7) * 6 * (1 - t)).toFixed(1)}`; }
-  return `<svg viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><rect width="400" height="260" fill="#eef4fc"/>
-    <path d="${d}" fill="none" stroke="#1d5fd6" stroke-width="3" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"><animate attributeName="stroke-dashoffset" values="1;0;0" keyTimes="0;.5;1" dur="4s" repeatCount="indefinite"/></path>
-    <line x1="20" y1="226" x2="380" y2="226" stroke="#c3d3ea"/>
-    <text x="300" y="80" fill="#e0521b" font-family="Instrument Serif, Georgia, serif" font-style="italic" font-size="26">gap?</text>
-    <circle cx="290" cy="200" r="16" fill="none" stroke="#e0521b" stroke-width="2"/></svg>`;
+    ${[0, 1, 2].map(i => `<rect x="${36 + i * 14}" y="${50 + i * 14}" width="110" height="140" rx="6" fill="#0d1730" stroke="#1f2d50"/>`).join('')}
+    ${[0, 1, 2, 3, 4].map(i => `<rect x="76" y="${96 + i * 16}" width="${60 - i * 6}" height="5" rx="2" fill="#8ea3c7" opacity=".6"/>`).join('')}
+    <path d="M196 130 h34" stroke="#ff7a45" stroke-width="2" stroke-dasharray="4 4"><animate attributeName="stroke-dashoffset" from="16" to="0" dur="1s" repeatCount="indefinite"/></path>
+    ${bars.map((h, i) => `<rect x="${250 + i * 30}" y="${210 - h}" width="20" height="${h}" rx="3" fill="${i === 3 ? '#ff7a45' : '#3d8bff'}"/>`).join('')}
+    <text x="250" y="40" fill="#8ea3c7" font-family="Geist Mono, monospace" font-size="10">RISK · 4 LAYERS</text></svg>`;
 }
 
 const ribbon = $('#ribbon');
